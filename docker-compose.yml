@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  # ── PostgreSQL Database ─────────────────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: minecore-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: minecore_user
+      POSTGRES_PASSWORD: minecore_password
+      POSTGRES_DB: minecore_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - minecore-network
+
+  # ── Express.js Backend ──────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: minecore-backend
+    restart: always
+    ports:
+      - "4000:4000"
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      API_VERSION: v1
+      DATABASE_URL: "postgresql://minecore_user:minecore_password@postgres:5432/minecore_db?schema=public"
+      JWT_ACCESS_SECRET: "minecore_access_secret_production_ready"
+      JWT_REFRESH_SECRET: "minecore_refresh_secret_production_ready"
+      JWT_ACCESS_EXPIRES_IN: "24h"
+      JWT_REFRESH_EXPIRES_IN: "7d"
+      CORS_ORIGIN: "http://localhost:3000"
+      RATE_LIMIT_WINDOW_MS: 900000
+      RATE_LIMIT_MAX: 100
+    depends_on:
+      - postgres
+    # Run migrations on startup before running server.js
+    command: sh -c "npx prisma migrate deploy && node dist/server.js"
+    networks:
+      - minecore-network
+
+  # ── Next.js Frontend ────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=http://localhost:4000
+    container_name: minecore-frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - minecore-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  minecore-network:
+    driver: bridge
