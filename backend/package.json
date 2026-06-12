@@ -15,7 +15,8 @@
     "db:migrate:prod": "prisma migrate deploy",
     "db:studio": "prisma studio",
     "db:seed": "ts-node prisma/seed.ts",
-    "db:reset": "prisma migrate reset --force"
+    "db:reset": "prisma migrate reset --force",
+    "test": "echo \"No tests specified\" && exit 0"
   },
   "dependencies": {
     "@prisma/client": "^5.14.0",

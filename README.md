@@ -1,5 +1,7 @@
 # MineCore — Smart Mining Operations Platform
 
+![CI](https://github.com/San120806/MineCore/actions/workflows/ci.yml/badge.svg)
+
 Welcome to the **MineCore** repository! MineCore is an enterprise-grade full-stack operations command center designed for monitoring heavy fleet activities, IoT sensor readings, equipment health, safety alerts, and maintenance logs in mining operations.
 
 ---
