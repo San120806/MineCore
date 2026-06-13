@@ -1,12 +1,20 @@
-'use client';
+"use client";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MineCore — Top Navigation Bar
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { usePathname } from 'next/navigation';
-import { Bell, Sun, Moon, LogOut, User, Settings, ChevronDown } from 'lucide-react';
-import { useTheme } from 'next-themes';
+import { usePathname } from "next/navigation";
+import {
+  Bell,
+  Sun,
+  Moon,
+  LogOut,
+  User,
+  Settings,
+  ChevronDown,
+} from "lucide-react";
+import { useTheme } from "next-themes";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,25 +23,29 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
-import { getInitials } from '@/lib/utils';
-import { ALL_NAV_ITEMS } from '@/constants/nav';
-import { useAuth } from '@/hooks/useAuth';
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { getInitials } from "@/lib/utils";
+import { ALL_NAV_ITEMS } from "@/constants/nav";
+import { useAuth } from "@/hooks/useAuth";
 
 // ─── Derive page title from pathname ─────────────────────────────────────────
 
 function usePageTitle(pathname: string): string {
   const match = ALL_NAV_ITEMS.find((item) =>
-    item.href === '/dashboard'
+    item.href === "/dashboard"
       ? pathname === item.href
       : pathname.startsWith(item.href),
   );
-  return match?.label ?? 'MineCore';
+  return match?.label ?? "MineCore";
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -65,7 +77,7 @@ export function Navbar() {
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                 aria-label="Toggle theme"
               />
             }
@@ -92,16 +104,16 @@ export function Navbar() {
             {openAlerts > 0 && (
               <span
                 className={cn(
-                  'absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center',
-                  'rounded-full bg-destructive text-[10px] font-bold text-white',
+                  "absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center",
+                  "rounded-full bg-destructive text-[10px] font-bold text-white",
                 )}
               >
-                {openAlerts > 9 ? '9+' : openAlerts}
+                {openAlerts > 9 ? "9+" : openAlerts}
               </span>
             )}
           </TooltipTrigger>
           <TooltipContent>
-            {openAlerts} open alert{openAlerts !== 1 ? 's' : ''}
+            {openAlerts} open alert{openAlerts !== 1 ? "s" : ""}
           </TooltipContent>
         </Tooltip>
 
@@ -131,9 +143,11 @@ export function Navbar() {
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col gap-0.5">
                 <p className="text-sm font-medium">{user.name}</p>
-                <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                <p className="text-xs text-muted-foreground truncate">
+                  {user.email}
+                </p>
                 <Badge variant="secondary" className="mt-1 text-[10px] w-fit">
-                  {user.role.replace('_', ' ')}
+                  {user.role.replace("_", " ")}
                 </Badge>
               </div>
             </DropdownMenuLabel>
@@ -149,7 +163,10 @@ export function Navbar() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={logout}>
+            <DropdownMenuItem
+              className="text-destructive focus:text-destructive"
+              onClick={logout}
+            >
               <LogOut className="mr-2 h-4 w-4" />
               Sign out
             </DropdownMenuItem>

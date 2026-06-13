@@ -2,32 +2,32 @@
 // MineCore — Auth Form Validators (Zod)
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { z } from 'zod';
+import { z } from "zod";
 
 export const loginSchema = z.object({
   email: z
     .string()
-    .min(1, 'Email is required')
-    .email('Enter a valid email address'),
+    .min(1, "Email is required")
+    .email("Enter a valid email address"),
   password: z
     .string()
-    .min(1, 'Password is required')
-    .min(6, 'Password must be at least 6 characters'),
+    .min(1, "Password is required")
+    .min(6, "Password must be at least 6 characters"),
   rememberMe: z.boolean().optional(),
 });
 
 export type LoginFormValues = z.infer<typeof loginSchema>;
 
 export const registerSchema = z.object({
-  name: z.string().min(1, 'Name is required').min(2, 'Name is too short'),
+  name: z.string().min(1, "Name is required").min(2, "Name is too short"),
   email: z
     .string()
-    .min(1, 'Email is required')
-    .email('Enter a valid email address'),
+    .min(1, "Email is required")
+    .email("Enter a valid email address"),
   password: z
     .string()
-    .min(1, 'Password is required')
-    .min(8, 'Password must be at least 8 characters'),
+    .min(1, "Password is required")
+    .min(8, "Password must be at least 8 characters"),
   role: z.string().optional(),
 });
 

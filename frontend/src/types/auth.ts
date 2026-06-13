@@ -2,7 +2,7 @@
 // MineCore — Auth Types
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { UserRole } from './enums';
+import { UserRole } from "./enums";
 
 export interface User {
   id: string;

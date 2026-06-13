@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MineCore — DataTable Component (TanStack Table v8)
 // Generic table with sorting, column visibility, and integrated pagination
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { useState } from 'react';
+import { useState } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -14,7 +14,7 @@ import {
   type ColumnDef,
   type SortingState,
   type VisibilityState,
-} from '@tanstack/react-table';
+} from "@tanstack/react-table";
 import {
   Table,
   TableBody,
@@ -22,12 +22,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { PaginationControls } from './PaginationControls';
-import { TableSkeleton } from '@/components/shared/LoadingSkeleton';
-import { EmptyState } from '@/components/shared/EmptyState';
+} from "@/components/ui/table";
+import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { PaginationControls } from "./PaginationControls";
+import { TableSkeleton } from "@/components/shared/LoadingSkeleton";
+import { EmptyState } from "@/components/shared/EmptyState";
 
 interface DataTableProps<TData> {
   columns: ColumnDef<TData, unknown>[];
@@ -52,7 +52,7 @@ export function DataTable<TData>({
   page = 1,
   pageSize = 10,
   onPageChange,
-  emptyTitle = 'No records found',
+  emptyTitle = "No records found",
   emptyDescription,
   className,
   meta,
@@ -78,12 +78,15 @@ export function DataTable<TData>({
   }
 
   return (
-    <div className={cn('space-y-3', className)}>
+    <div className={cn("space-y-3", className)}>
       <div className="rounded-lg border border-border overflow-hidden">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="hover:bg-transparent border-border">
+              <TableRow
+                key={headerGroup.id}
+                className="hover:bg-transparent border-border"
+              >
                 {headerGroup.headers.map((header) => {
                   const canSort = header.column.getCanSort();
                   const sorted = header.column.getIsSorted();
@@ -91,18 +94,26 @@ export function DataTable<TData>({
                     <TableHead
                       key={header.id}
                       className={cn(
-                        'text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted/40 h-10',
-                        canSort && 'cursor-pointer select-none hover:text-foreground',
+                        "text-xs font-semibold text-muted-foreground uppercase tracking-wider bg-muted/40 h-10",
+                        canSort &&
+                          "cursor-pointer select-none hover:text-foreground",
                       )}
-                      onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
+                      onClick={
+                        canSort
+                          ? header.column.getToggleSortingHandler()
+                          : undefined
+                      }
                     >
                       <div className="flex items-center gap-1">
-                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                         {canSort && (
                           <span className="ml-0.5 opacity-60">
-                            {sorted === 'asc' ? (
+                            {sorted === "asc" ? (
                               <ChevronUp className="w-3 h-3" />
-                            ) : sorted === 'desc' ? (
+                            ) : sorted === "desc" ? (
                               <ChevronDown className="w-3 h-3" />
                             ) : (
                               <ChevronsUpDown className="w-3 h-3" />
@@ -135,7 +146,10 @@ export function DataTable<TData>({
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="text-sm py-3">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>

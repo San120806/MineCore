@@ -2,26 +2,26 @@
 // MineCore — Sites Table Column Definitions (TanStack Table)
 // ─────────────────────────────────────────────────────────────────────────────
 
-import type { ColumnDef } from '@tanstack/react-table';
-import type { MiningSite } from '@/types/site';
-import { StatusBadge } from '@/components/shared/StatusBadge';
-import { formatDate } from '@/lib/utils';
-import Link from 'next/link';
-import { ROUTES } from '@/constants/routes';
+import type { ColumnDef } from "@tanstack/react-table";
+import type { MiningSite } from "@/types/site";
+import { StatusBadge } from "@/components/shared/StatusBadge";
+import { formatDate } from "@/lib/utils";
+import Link from "next/link";
+import { ROUTES } from "@/constants/routes";
 
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Edit, Trash } from 'lucide-react';
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { MoreHorizontal, Edit, Trash } from "lucide-react";
 
 export const siteColumns: ColumnDef<MiningSite, unknown>[] = [
   {
-    accessorKey: 'name',
-    header: 'Site Name',
+    accessorKey: "name",
+    header: "Site Name",
     cell: ({ row }) => (
       <Link
         href={ROUTES.SITE_DETAIL(row.original.id)}
@@ -33,38 +33,40 @@ export const siteColumns: ColumnDef<MiningSite, unknown>[] = [
     enableSorting: true,
   },
   {
-    accessorKey: 'location',
-    header: 'Location',
+    accessorKey: "location",
+    header: "Location",
     cell: ({ getValue }) => (
-      <span className="text-muted-foreground text-sm">{String(getValue())}</span>
+      <span className="text-muted-foreground text-sm">
+        {String(getValue())}
+      </span>
     ),
     enableSorting: false,
   },
   {
-    accessorKey: 'status',
-    header: 'Status',
+    accessorKey: "status",
+    header: "Status",
     cell: ({ getValue }) => <StatusBadge value={String(getValue())} />,
     enableSorting: true,
   },
   {
-    accessorKey: 'workerCount',
-    header: 'Workers',
+    accessorKey: "workerCount",
+    header: "Workers",
     cell: ({ getValue }) => (
       <span className="tabular-nums">{String(getValue())}</span>
     ),
     enableSorting: true,
   },
   {
-    accessorKey: 'managerName',
-    header: 'Manager',
+    accessorKey: "managerName",
+    header: "Manager",
     cell: ({ getValue }) => (
-      <span className="text-muted-foreground">{String(getValue() ?? '—')}</span>
+      <span className="text-muted-foreground">{String(getValue() ?? "—")}</span>
     ),
     enableSorting: false,
   },
   {
-    accessorKey: 'createdAt',
-    header: 'Created',
+    accessorKey: "createdAt",
+    header: "Created",
     cell: ({ getValue }) => (
       <span className="text-muted-foreground text-xs tabular-nums">
         {formatDate(String(getValue()))}
@@ -73,8 +75,8 @@ export const siteColumns: ColumnDef<MiningSite, unknown>[] = [
     enableSorting: true,
   },
   {
-    id: 'actions',
-    header: '',
+    id: "actions",
+    header: "",
     cell: ({ row, table }) => {
       const site = row.original;
       const meta = table.options.meta as any;

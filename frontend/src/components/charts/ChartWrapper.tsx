@@ -3,10 +3,10 @@
 // Wraps all Recharts with title, loading, and error states
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { cn } from '@/lib/utils';
-import { Skeleton } from '@/components/ui/skeleton';
-import { AlertTriangle, BarChart2 } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
+import { AlertTriangle, BarChart2 } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 interface ChartWrapperProps {
   title: string;
@@ -27,12 +27,12 @@ export function ChartWrapper({
   isLoading = false,
   isError = false,
   isEmpty = false,
-  emptyText = 'No data available',
+  emptyText = "No data available",
   height = 280,
   className,
 }: ChartWrapperProps) {
   return (
-    <Card className={cn('p-4', className)}>
+    <Card className={cn("p-4", className)}>
       {/* Chart header */}
       <div className="mb-4">
         <p className="text-sm font-semibold text-foreground">{title}</p>
@@ -50,7 +50,9 @@ export function ChartWrapper({
           className="flex flex-col items-center justify-center text-center gap-2"
         >
           <AlertTriangle className="w-8 h-8 text-muted-foreground" />
-          <p className="text-xs text-muted-foreground">Failed to load chart data</p>
+          <p className="text-xs text-muted-foreground">
+            Failed to load chart data
+          </p>
         </div>
       ) : isEmpty ? (
         <div

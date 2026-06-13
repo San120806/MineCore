@@ -1,23 +1,23 @@
-'use client';
+"use client";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MineCore — Login Page
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Pickaxe, Eye, EyeOff, Loader2 } from 'lucide-react';
-import { useState } from 'react';
-import { loginSchema, type LoginFormValues } from '@/lib/validators/auth';
-import { FormField } from '@/components/forms/FormField';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { cn } from '@/lib/utils';
-import { useAuth } from '@/hooks/useAuth';
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
-import { ROUTES } from '@/constants/routes';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Pickaxe, Eye, EyeOff, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { loginSchema, type LoginFormValues } from "@/lib/validators/auth";
+import { FormField } from "@/components/forms/FormField";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { ROUTES } from "@/constants/routes";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -31,7 +31,7 @@ export default function LoginPage() {
     formState: { errors, isSubmitting },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: '', password: '', rememberMe: false },
+    defaultValues: { email: "", password: "", rememberMe: false },
   });
 
   const onSubmit = async (data: LoginFormValues) => {
@@ -42,11 +42,14 @@ export default function LoginPage() {
         password: data.password,
         rememberMe: data.rememberMe,
       });
-      toast.success('Successfully signed in to MineCore!');
+      toast.success("Successfully signed in to MineCore!");
       router.push(ROUTES.DASHBOARD);
     } catch (err: any) {
-      console.error('Login error details:', err);
-      const msg = err.response?.data?.message || err.message || 'Invalid email or password';
+      console.error("Login error details:", err);
+      const msg =
+        err.response?.data?.message ||
+        err.message ||
+        "Invalid email or password";
       setServerError(msg);
       toast.error(msg);
     }
@@ -60,7 +63,9 @@ export default function LoginPage() {
           <Pickaxe className="w-6 h-6 text-primary" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">MineCore</h1>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">
+            MineCore
+          </h1>
           <p className="text-sm text-muted-foreground mt-1">
             Smart Mining Operations Platform
           </p>
@@ -84,7 +89,11 @@ export default function LoginPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-4"
+          noValidate
+        >
           {/* Email */}
           <FormField
             label="Email address"
@@ -94,7 +103,7 @@ export default function LoginPage() {
             autoComplete="email"
             required
             error={errors.email?.message}
-            {...register('email')}
+            {...register("email")}
           />
 
           {/* Password */}
@@ -105,25 +114,30 @@ export default function LoginPage() {
             <div className="relative">
               <input
                 id="login-password"
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
                 placeholder="••••••••"
                 aria-invalid={!!errors.password}
                 className={cn(
-                  'flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm',
-                  'transition-colors placeholder:text-muted-foreground focus-visible:outline-none',
-                  'focus-visible:ring-1 focus-visible:ring-ring pr-10',
-                  errors.password && 'border-destructive focus-visible:ring-destructive/30',
+                  "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm",
+                  "transition-colors placeholder:text-muted-foreground focus-visible:outline-none",
+                  "focus-visible:ring-1 focus-visible:ring-ring pr-10",
+                  errors.password &&
+                    "border-destructive focus-visible:ring-destructive/30",
                 )}
-                {...register('password')}
+                {...register("password")}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
               </button>
             </div>
             {errors.password && (
@@ -139,9 +153,12 @@ export default function LoginPage() {
               id="login-remember"
               type="checkbox"
               className="h-4 w-4 rounded border-border accent-primary"
-              {...register('rememberMe')}
+              {...register("rememberMe")}
             />
-            <Label htmlFor="login-remember" className="text-sm font-normal text-muted-foreground">
+            <Label
+              htmlFor="login-remember"
+              className="text-sm font-normal text-muted-foreground"
+            >
               Remember me for 7 days
             </Label>
           </div>
@@ -159,7 +176,7 @@ export default function LoginPage() {
                 Signing in…
               </>
             ) : (
-              'Sign in'
+              "Sign in"
             )}
           </Button>
         </form>

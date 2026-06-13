@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
-import { getSensors } from '@/services/sensors.service';
-import type { Sensor, SensorQueryParams } from '@/types/sensor';
-import { useDebounce } from '@/hooks/useDebounce';
-import { SensorStatus, SensorType } from '@/types/enums';
+import { useState, useEffect, useCallback } from "react";
+import { getSensors } from "@/services/sensors.service";
+import type { Sensor, SensorQueryParams } from "@/types/sensor";
+import { useDebounce } from "@/hooks/useDebounce";
+import { SensorStatus, SensorType } from "@/types/enums";
 
 export function useSensors() {
   const [data, setData] = useState<Sensor[]>([]);
@@ -11,9 +11,11 @@ export function useSensors() {
   const [error, setError] = useState<string | null>(null);
 
   // Filter and pagination state
-  const [search, setSearch] = useState<string>('');
+  const [search, setSearch] = useState<string>("");
   const [status, setStatus] = useState<SensorStatus | undefined>(undefined);
-  const [sensorType, setSensorType] = useState<SensorType | undefined>(undefined);
+  const [sensorType, setSensorType] = useState<SensorType | undefined>(
+    undefined,
+  );
   const [siteId, setSiteId] = useState<string | undefined>(undefined);
   const [page, setPage] = useState<number>(1);
   const [pageSize] = useState<number>(10);
@@ -36,8 +38,10 @@ export function useSensors() {
       setData(response.data);
       setTotalCount(response.meta.total);
     } catch (err: any) {
-      console.error('Error fetching sensors:', err);
-      setError(err.response?.data?.message || err.message || 'Failed to load sensors');
+      console.error("Error fetching sensors:", err);
+      setError(
+        err.response?.data?.message || err.message || "Failed to load sensors",
+      );
     } finally {
       setIsLoading(false);
     }

@@ -3,12 +3,12 @@
 // Fetches, aggregates, and structures live backend data for Recharts components.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { getSites } from './sites.service';
-import { getVehicles } from './vehicles.service';
-import { getSensors } from './sensors.service';
-import { getAlerts } from './alerts.service';
-import { getEquipmentList } from './equipment.service';
-import { getMaintenanceList } from './maintenance.service';
+import { getSites } from "./sites.service";
+import { getVehicles } from "./vehicles.service";
+import { getSensors } from "./sensors.service";
+import { getAlerts } from "./alerts.service";
+import { getEquipmentList } from "./equipment.service";
+import { getMaintenanceList } from "./maintenance.service";
 
 import {
   VehicleStatus,
@@ -21,7 +21,7 @@ import {
   EquipmentType,
   MaintenanceStatus,
   MaintenanceType,
-} from '@/types/enums';
+} from "@/types/enums";
 
 // Helper labels
 import {
@@ -29,7 +29,7 @@ import {
   SENSOR_TYPE_LABELS,
   EQUIPMENT_TYPE_LABELS,
   MAINTENANCE_TYPE_LABELS,
-} from '@/constants/enums';
+} from "@/constants/enums";
 
 export interface ChartPieEntry {
   name: string;
@@ -106,14 +106,33 @@ export const getAnalyticsData = async (): Promise<AnalyticsData> => {
     }
   });
   const vehicleStatus: ChartPieEntry[] = [
-    { name: 'Active', value: vehicleStatusMap[VehicleStatus.ACTIVE], fill: '#10b981' },
-    { name: 'Idle', value: vehicleStatusMap[VehicleStatus.IDLE], fill: '#6b7280' },
-    { name: 'Maintenance', value: vehicleStatusMap[VehicleStatus.MAINTENANCE], fill: '#f59e0b' },
-    { name: 'Offline', value: vehicleStatusMap[VehicleStatus.OFFLINE], fill: '#ef4444' },
+    {
+      name: "Active",
+      value: vehicleStatusMap[VehicleStatus.ACTIVE],
+      fill: "#10b981",
+    },
+    {
+      name: "Idle",
+      value: vehicleStatusMap[VehicleStatus.IDLE],
+      fill: "#6b7280",
+    },
+    {
+      name: "Maintenance",
+      value: vehicleStatusMap[VehicleStatus.MAINTENANCE],
+      fill: "#f59e0b",
+    },
+    {
+      name: "Offline",
+      value: vehicleStatusMap[VehicleStatus.OFFLINE],
+      fill: "#ef4444",
+    },
   ];
 
   // 2. Vehicle Site Utilization (Area Chart)
-  const vehicleSiteMap: Record<string, { label: string; active: number; idle: number }> = {};
+  const vehicleSiteMap: Record<
+    string,
+    { label: string; active: number; idle: number }
+  > = {};
   sites.forEach((s) => {
     vehicleSiteMap[s.id] = { label: s.name, active: 0, idle: 0 };
   });
@@ -130,7 +149,8 @@ export const getAnalyticsData = async (): Promise<AnalyticsData> => {
   const vehicleSiteUtilization = Object.values(vehicleSiteMap);
 
   // 3. Vehicle Type Average Fuel / Battery Level (Bar Chart)
-  const vehicleTypeMap: Record<VehicleType, { sum: number; count: number }> = {} as any;
+  const vehicleTypeMap: Record<VehicleType, { sum: number; count: number }> =
+    {} as any;
   Object.values(VehicleType).forEach((t) => {
     vehicleTypeMap[t] = { sum: 0, count: 0 };
   });
@@ -140,11 +160,13 @@ export const getAnalyticsData = async (): Promise<AnalyticsData> => {
       vehicleTypeMap[v.type].count++;
     }
   });
-  const vehicleTypeAvgFuel = Object.entries(vehicleTypeMap).map(([type, stats]) => {
-    const label = VEHICLE_TYPE_LABELS[type as VehicleType] || type;
-    const avg = stats.count > 0 ? Math.round(stats.sum / stats.count) : 0;
-    return { label, fuel: avg };
-  });
+  const vehicleTypeAvgFuel = Object.entries(vehicleTypeMap).map(
+    ([type, stats]) => {
+      const label = VEHICLE_TYPE_LABELS[type as VehicleType] || type;
+      const avg = stats.count > 0 ? Math.round(stats.sum / stats.count) : 0;
+      return { label, fuel: avg };
+    },
+  );
 
   // 4. Equipment Status Breakdown (Pie Chart)
   const equipStatusMap: Record<EquipmentStatus, number> = {
@@ -159,10 +181,26 @@ export const getAnalyticsData = async (): Promise<AnalyticsData> => {
     }
   });
   const equipmentStatus: ChartPieEntry[] = [
-    { name: 'Operational', value: equipStatusMap[EquipmentStatus.OPERATIONAL], fill: '#10b981' },
-    { name: 'Degraded', value: equipStatusMap[EquipmentStatus.DEGRADED], fill: '#f59e0b' },
-    { name: 'Offline', value: equipStatusMap[EquipmentStatus.OFFLINE], fill: '#ef4444' },
-    { name: 'Decommissioned', value: equipStatusMap[EquipmentStatus.DECOMMISSIONED], fill: '#6b7280' },
+    {
+      name: "Operational",
+      value: equipStatusMap[EquipmentStatus.OPERATIONAL],
+      fill: "#10b981",
+    },
+    {
+      name: "Degraded",
+      value: equipStatusMap[EquipmentStatus.DEGRADED],
+      fill: "#f59e0b",
+    },
+    {
+      name: "Offline",
+      value: equipStatusMap[EquipmentStatus.OFFLINE],
+      fill: "#ef4444",
+    },
+    {
+      name: "Decommissioned",
+      value: equipStatusMap[EquipmentStatus.DECOMMISSIONED],
+      fill: "#6b7280",
+    },
   ];
 
   // 5. Equipment Health score distribution (Pie Chart)
@@ -176,13 +214,14 @@ export const getAnalyticsData = async (): Promise<AnalyticsData> => {
     else criticalEquip++;
   });
   const equipmentHealthDist: ChartPieEntry[] = [
-    { name: 'Optimal (>85)', value: optimalEquip, fill: '#10b981' },
-    { name: 'Warning (51-85)', value: warningEquip, fill: '#f59e0b' },
-    { name: 'Critical (0-50)', value: criticalEquip, fill: '#ef4444' },
+    { name: "Optimal (>85)", value: optimalEquip, fill: "#10b981" },
+    { name: "Warning (51-85)", value: warningEquip, fill: "#f59e0b" },
+    { name: "Critical (0-50)", value: criticalEquip, fill: "#ef4444" },
   ];
 
   // 6. Equipment Average Health by Type (Bar Chart)
-  const equipTypeMap: Record<EquipmentType, { sum: number; count: number }> = {} as any;
+  const equipTypeMap: Record<EquipmentType, { sum: number; count: number }> =
+    {} as any;
   Object.values(EquipmentType).forEach((t) => {
     equipTypeMap[t] = { sum: 0, count: 0 };
   });
@@ -192,11 +231,13 @@ export const getAnalyticsData = async (): Promise<AnalyticsData> => {
       equipTypeMap[e.type].count++;
     }
   });
-  const equipmentTypeAvgHealth = Object.entries(equipTypeMap).map(([type, stats]) => {
-    const label = EQUIPMENT_TYPE_LABELS[type as EquipmentType] || type;
-    const avg = stats.count > 0 ? Math.round(stats.sum / stats.count) : 0;
-    return { label, health: avg };
-  });
+  const equipmentTypeAvgHealth = Object.entries(equipTypeMap).map(
+    ([type, stats]) => {
+      const label = EQUIPMENT_TYPE_LABELS[type as EquipmentType] || type;
+      const avg = stats.count > 0 ? Math.round(stats.sum / stats.count) : 0;
+      return { label, health: avg };
+    },
+  );
 
   // 7. Sensor Type Distribution (Pie Chart)
   const sensorTypeCountMap: Record<SensorType, number> = {
@@ -211,7 +252,9 @@ export const getAnalyticsData = async (): Promise<AnalyticsData> => {
       sensorTypeCountMap[s.sensorType]++;
     }
   });
-  const sensorTypeDist: ChartPieEntry[] = Object.entries(sensorTypeCountMap).map(([type, count]) => ({
+  const sensorTypeDist: ChartPieEntry[] = Object.entries(
+    sensorTypeCountMap,
+  ).map(([type, count]) => ({
     name: SENSOR_TYPE_LABELS[type as SensorType] || type,
     value: count,
   }));
@@ -229,14 +272,15 @@ export const getAnalyticsData = async (): Promise<AnalyticsData> => {
     }
   });
   const sensorStatus: ChartBarEntry[] = [
-    { label: 'Online', count: sensorStatusMap[SensorStatus.ONLINE] },
-    { label: 'Degraded', count: sensorStatusMap[SensorStatus.DEGRADED] },
-    { label: 'Offline', count: sensorStatusMap[SensorStatus.OFFLINE] },
-    { label: 'Calibrating', count: sensorStatusMap[SensorStatus.CALIBRATING] },
+    { label: "Online", count: sensorStatusMap[SensorStatus.ONLINE] },
+    { label: "Degraded", count: sensorStatusMap[SensorStatus.DEGRADED] },
+    { label: "Offline", count: sensorStatusMap[SensorStatus.OFFLINE] },
+    { label: "Calibrating", count: sensorStatusMap[SensorStatus.CALIBRATING] },
   ];
 
   // 9. Sensor Type Average Value (Line Chart)
-  const sensorValueMap: Record<SensorType, { sum: number; count: number }> = {} as any;
+  const sensorValueMap: Record<SensorType, { sum: number; count: number }> =
+    {} as any;
   Object.values(SensorType).forEach((t) => {
     sensorValueMap[t] = { sum: 0, count: 0 };
   });
@@ -246,11 +290,14 @@ export const getAnalyticsData = async (): Promise<AnalyticsData> => {
       sensorValueMap[s.sensorType].count++;
     }
   });
-  const sensorTypeAvgValue = Object.entries(sensorValueMap).map(([type, stats]) => {
-    const label = SENSOR_TYPE_LABELS[type as SensorType] || type;
-    const avg = stats.count > 0 ? Number((stats.sum / stats.count).toFixed(2)) : 0;
-    return { label, value: avg };
-  });
+  const sensorTypeAvgValue = Object.entries(sensorValueMap).map(
+    ([type, stats]) => {
+      const label = SENSOR_TYPE_LABELS[type as SensorType] || type;
+      const avg =
+        stats.count > 0 ? Number((stats.sum / stats.count).toFixed(2)) : 0;
+      return { label, value: avg };
+    },
+  );
 
   // 10. Alert Severity Distribution (Pie Chart)
   const alertSeverityMap: Record<AlertSeverity, number> = {
@@ -265,10 +312,26 @@ export const getAnalyticsData = async (): Promise<AnalyticsData> => {
     }
   });
   const alertSeverity: ChartPieEntry[] = [
-    { name: 'Low', value: alertSeverityMap[AlertSeverity.LOW], fill: '#3b82f6' },
-    { name: 'Medium', value: alertSeverityMap[AlertSeverity.MEDIUM], fill: '#10b981' },
-    { name: 'High', value: alertSeverityMap[AlertSeverity.HIGH], fill: '#f59e0b' },
-    { name: 'Critical', value: alertSeverityMap[AlertSeverity.CRITICAL], fill: '#ef4444' },
+    {
+      name: "Low",
+      value: alertSeverityMap[AlertSeverity.LOW],
+      fill: "#3b82f6",
+    },
+    {
+      name: "Medium",
+      value: alertSeverityMap[AlertSeverity.MEDIUM],
+      fill: "#10b981",
+    },
+    {
+      name: "High",
+      value: alertSeverityMap[AlertSeverity.HIGH],
+      fill: "#f59e0b",
+    },
+    {
+      name: "Critical",
+      value: alertSeverityMap[AlertSeverity.CRITICAL],
+      fill: "#ef4444",
+    },
   ];
 
   // 11. Alert Frequency by Site (Bar Chart)
@@ -285,7 +348,10 @@ export const getAnalyticsData = async (): Promise<AnalyticsData> => {
   const alertFrequencyBySite = Object.values(alertSiteMap);
 
   // 12. Alert Status: Open vs Acknowledged vs Resolved Ratio (Area Chart)
-  const alertStatusSiteMap: Record<string, { label: string; open: number; resolved: number }> = {};
+  const alertStatusSiteMap: Record<
+    string,
+    { label: string; open: number; resolved: number }
+  > = {};
   sites.forEach((s) => {
     alertStatusSiteMap[s.id] = { label: s.name, open: 0, resolved: 0 };
   });
@@ -314,10 +380,26 @@ export const getAnalyticsData = async (): Promise<AnalyticsData> => {
     }
   });
   const maintenanceStatus: ChartPieEntry[] = [
-    { name: 'Scheduled', value: maintenanceStatusMap[MaintenanceStatus.SCHEDULED], fill: '#3b82f6' },
-    { name: 'In Progress', value: maintenanceStatusMap[MaintenanceStatus.IN_PROGRESS], fill: '#f59e0b' },
-    { name: 'Completed', value: maintenanceStatusMap[MaintenanceStatus.COMPLETED], fill: '#10b981' },
-    { name: 'Cancelled', value: maintenanceStatusMap[MaintenanceStatus.CANCELLED], fill: '#6b7280' },
+    {
+      name: "Scheduled",
+      value: maintenanceStatusMap[MaintenanceStatus.SCHEDULED],
+      fill: "#3b82f6",
+    },
+    {
+      name: "In Progress",
+      value: maintenanceStatusMap[MaintenanceStatus.IN_PROGRESS],
+      fill: "#f59e0b",
+    },
+    {
+      name: "Completed",
+      value: maintenanceStatusMap[MaintenanceStatus.COMPLETED],
+      fill: "#10b981",
+    },
+    {
+      name: "Cancelled",
+      value: maintenanceStatusMap[MaintenanceStatus.CANCELLED],
+      fill: "#6b7280",
+    },
   ];
 
   // 14. Maintenance Type Distribution (Bar Chart)
@@ -332,10 +414,12 @@ export const getAnalyticsData = async (): Promise<AnalyticsData> => {
       maintenanceTypeMap[m.type]++;
     }
   });
-  const maintenanceTypeDist = Object.entries(maintenanceTypeMap).map(([type, count]) => ({
-    label: MAINTENANCE_TYPE_LABELS[type as MaintenanceType] || type,
-    count,
-  }));
+  const maintenanceTypeDist = Object.entries(maintenanceTypeMap).map(
+    ([type, count]) => ({
+      label: MAINTENANCE_TYPE_LABELS[type as MaintenanceType] || type,
+      count,
+    }),
+  );
 
   // 15. Maintenance Cost by Site (Area Chart)
   const maintCostSiteMap: Record<string, { label: string; cost: number }> = {};

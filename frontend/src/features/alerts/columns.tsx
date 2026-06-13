@@ -2,34 +2,36 @@
 // MineCore — Alerts Table Column Definitions
 // ─────────────────────────────────────────────────────────────────────────────
 
-import type { ColumnDef } from '@tanstack/react-table';
-import type { SafetyAlert } from '@/types/alert';
-import { StatusBadge } from '@/components/shared/StatusBadge';
-import { formatDateTime } from '@/lib/utils';
-import { truncate } from '@/lib/utils';
+import type { ColumnDef } from "@tanstack/react-table";
+import type { SafetyAlert } from "@/types/alert";
+import { StatusBadge } from "@/components/shared/StatusBadge";
+import { formatDateTime } from "@/lib/utils";
+import { truncate } from "@/lib/utils";
 
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Trash, CheckCheck, ShieldCheck } from 'lucide-react';
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { MoreHorizontal, Trash, CheckCheck, ShieldCheck } from "lucide-react";
 
 export const alertColumns: ColumnDef<SafetyAlert, unknown>[] = [
   {
-    accessorKey: 'severity',
-    header: 'Severity',
+    accessorKey: "severity",
+    header: "Severity",
     cell: ({ getValue }) => <StatusBadge value={String(getValue())} />,
     enableSorting: true,
   },
   {
-    accessorKey: 'title',
-    header: 'Alert',
+    accessorKey: "title",
+    header: "Alert",
     cell: ({ row }) => (
       <div className="min-w-0">
-        <p className="font-medium text-sm truncate max-w-xs">{row.original.title}</p>
+        <p className="font-medium text-sm truncate max-w-xs">
+          {row.original.title}
+        </p>
         <p className="text-xs text-muted-foreground truncate max-w-xs">
           {truncate(row.original.description, 60)}
         </p>
@@ -38,30 +40,34 @@ export const alertColumns: ColumnDef<SafetyAlert, unknown>[] = [
     enableSorting: true,
   },
   {
-    accessorKey: 'status',
-    header: 'Status',
+    accessorKey: "status",
+    header: "Status",
     cell: ({ getValue }) => <StatusBadge value={String(getValue())} />,
     enableSorting: true,
   },
   {
-    accessorKey: 'site',
-    header: 'Site',
+    accessorKey: "site",
+    header: "Site",
     cell: ({ row }) => (
-      <span className="text-sm text-muted-foreground">{row.original.site?.name ?? '—'}</span>
+      <span className="text-sm text-muted-foreground">
+        {row.original.site?.name ?? "—"}
+      </span>
     ),
     enableSorting: false,
   },
   {
-    accessorKey: 'raisedBy',
-    header: 'Raised By',
+    accessorKey: "raisedBy",
+    header: "Raised By",
     cell: ({ row }) => (
-      <span className="text-sm text-muted-foreground">{row.original.raisedBy?.name ?? '—'}</span>
+      <span className="text-sm text-muted-foreground">
+        {row.original.raisedBy?.name ?? "—"}
+      </span>
     ),
     enableSorting: false,
   },
   {
-    accessorKey: 'raisedAt',
-    header: 'Raised At',
+    accessorKey: "raisedAt",
+    header: "Raised At",
     cell: ({ getValue }) => (
       <span className="text-xs text-muted-foreground tabular-nums">
         {formatDateTime(getValue() as string)}
@@ -70,14 +76,14 @@ export const alertColumns: ColumnDef<SafetyAlert, unknown>[] = [
     enableSorting: true,
   },
   {
-    id: 'actions',
-    header: '',
+    id: "actions",
+    header: "",
     cell: ({ row, table }) => {
       const alert = row.original;
       const meta = table.options.meta as any;
-      const isOpen = alert.status === 'OPEN';
-      const isAcknowledged = alert.status === 'ACKNOWLEDGED';
-      const isResolved = alert.status === 'RESOLVED';
+      const isOpen = alert.status === "OPEN";
+      const isAcknowledged = alert.status === "ACKNOWLEDGED";
+      const isResolved = alert.status === "RESOLVED";
 
       return (
         <DropdownMenu>

@@ -2,7 +2,12 @@
 // MineCore — Dashboard Types
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { AlertSeverity, VehicleStatus, SensorStatus, EquipmentStatus } from './enums';
+import {
+  AlertSeverity,
+  VehicleStatus,
+  SensorStatus,
+  EquipmentStatus,
+} from "./enums";
 
 export interface DashboardKPIs {
   totalSites: number;
@@ -47,7 +52,7 @@ export interface EquipmentHealthBracket {
 
 export interface ActivityFeedItem {
   id: string;
-  type: 'alert' | 'maintenance' | 'vehicle' | 'sensor' | 'equipment';
+  type: "alert" | "maintenance" | "vehicle" | "sensor" | "equipment";
   title: string;
   description: string;
   timestamp: string;

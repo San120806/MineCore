@@ -3,9 +3,9 @@
 // Protected route guard will be wired in Session 2.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { Sidebar } from '@/components/layout/Sidebar';
-import { Navbar } from '@/components/layout/Navbar';
-import { ProtectedRoute } from '@/features/auth/guards/ProtectedRoute';
+import { Sidebar } from "@/components/layout/Sidebar";
+import { Navbar } from "@/components/layout/Navbar";
+import { ProtectedRoute } from "@/features/auth/guards/ProtectedRoute";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (

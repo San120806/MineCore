@@ -1,23 +1,28 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { PageHeader } from '@/components/layout/PageHeader';
-import { Button } from '@/components/ui/button';
-import { Plus, Search, Filter, AlertTriangle, CheckSquare } from 'lucide-react';
-import { DataTable } from '@/components/tables/DataTable';
-import { SearchBar } from '@/components/tables/SearchBar';
-import { alertColumns } from '@/features/alerts/columns';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { RoleGuard } from '@/features/auth/guards/RoleGuard';
-import { UserRole, AlertSeverity, AlertStatus } from '@/types/enums';
-import { useAlerts } from '@/features/alerts/hooks';
-import { getSites } from '@/services/sites.service';
-import { createAlert, acknowledgeAlert, resolveAlert, deleteAlert } from '@/services/alerts.service';
-import type { MiningSite } from '@/types/site';
-import { toast } from 'sonner';
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { Button } from "@/components/ui/button";
+import { Plus, Search, Filter, AlertTriangle, CheckSquare } from "lucide-react";
+import { DataTable } from "@/components/tables/DataTable";
+import { SearchBar } from "@/components/tables/SearchBar";
+import { alertColumns } from "@/features/alerts/columns";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { RoleGuard } from "@/features/auth/guards/RoleGuard";
+import { UserRole, AlertSeverity, AlertStatus } from "@/types/enums";
+import { useAlerts } from "@/features/alerts/hooks";
+import { getSites } from "@/services/sites.service";
+import {
+  createAlert,
+  acknowledgeAlert,
+  resolveAlert,
+  deleteAlert,
+} from "@/services/alerts.service";
+import type { MiningSite } from "@/types/site";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -25,16 +30,24 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-import { useAuthContext } from '@/features/auth/context/AuthContext';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { useAuthContext } from "@/features/auth/context/AuthContext";
 
 const alertFormSchema = z.object({
-  siteId: z.string().min(1, 'Site assignment is required'),
-  title: z.string().min(2, 'Alert title must be at least 2 characters'),
-  description: z.string().min(5, 'Provide a description of the safety issue (min 5 chars)'),
+  siteId: z.string().min(1, "Site assignment is required"),
+  title: z.string().min(2, "Alert title must be at least 2 characters"),
+  description: z
+    .string()
+    .min(5, "Provide a description of the safety issue (min 5 chars)"),
   severity: z.nativeEnum(AlertSeverity),
   location: z.string().optional(),
 });
@@ -67,32 +80,32 @@ export default function SafetyPage() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedAlert, setSelectedAlert] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [resolutionNotes, setResolutionNotes] = useState('');
+  const [resolutionNotes, setResolutionNotes] = useState("");
 
   useEffect(() => {
     getSites({ limit: 100 })
       .then((res) => setSites(res.data))
-      .catch((err) => console.error('Error fetching sites:', err));
+      .catch((err) => console.error("Error fetching sites:", err));
   }, []);
 
   const form = useForm<AlertFormValues>({
     resolver: zodResolver(alertFormSchema),
     defaultValues: {
-      siteId: '',
-      title: '',
-      description: '',
+      siteId: "",
+      title: "",
+      description: "",
       severity: AlertSeverity.MEDIUM,
-      location: '',
+      location: "",
     },
   });
 
   const handleRaiseClick = () => {
     form.reset({
-      siteId: sites[0]?.id || '',
-      title: '',
-      description: '',
+      siteId: sites[0]?.id || "",
+      title: "",
+      description: "",
       severity: AlertSeverity.MEDIUM,
-      location: '',
+      location: "",
     });
     setIsFormOpen(true);
   };
@@ -100,17 +113,21 @@ export default function SafetyPage() {
   const handleAcknowledge = async (alert: any) => {
     try {
       await acknowledgeAlert(alert.id);
-      toast.success('Alert acknowledged successfully');
+      toast.success("Alert acknowledged successfully");
       refetch();
     } catch (err: any) {
       console.error(err);
-      toast.error(err.response?.data?.message || err.message || 'Failed to acknowledge alert.');
+      toast.error(
+        err.response?.data?.message ||
+          err.message ||
+          "Failed to acknowledge alert.",
+      );
     }
   };
 
   const handleResolveClick = (alert: any) => {
     setSelectedAlert(alert);
-    setResolutionNotes('');
+    setResolutionNotes("");
     setIsResolveOpen(true);
   };
 
@@ -120,14 +137,18 @@ export default function SafetyPage() {
     try {
       await resolveAlert(selectedAlert.id, {
         resolvedById: user.id,
-        notes: resolutionNotes || 'Resolved via Safety operations dashboard.',
+        notes: resolutionNotes || "Resolved via Safety operations dashboard.",
       });
-      toast.success('Incident alert resolved successfully');
+      toast.success("Incident alert resolved successfully");
       setIsResolveOpen(false);
       refetch();
     } catch (err: any) {
       console.error(err);
-      toast.error(err.response?.data?.message || err.message || 'Failed to resolve alert.');
+      toast.error(
+        err.response?.data?.message ||
+          err.message ||
+          "Failed to resolve alert.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -143,12 +164,14 @@ export default function SafetyPage() {
     setIsSubmitting(true);
     try {
       await deleteAlert(selectedAlert.id);
-      toast.success('Safety alert deleted successfully');
+      toast.success("Safety alert deleted successfully");
       setIsDeleteOpen(false);
       refetch();
     } catch (err: any) {
       console.error(err);
-      toast.error(err.response?.data?.message || err.message || 'Failed to delete alert.');
+      toast.error(
+        err.response?.data?.message || err.message || "Failed to delete alert.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -158,25 +181,40 @@ export default function SafetyPage() {
     setIsSubmitting(true);
     try {
       await createAlert(values);
-      toast.success('Safety alert raised successfully');
+      toast.success("Safety alert raised successfully");
       setIsFormOpen(false);
       refetch();
     } catch (err: any) {
       console.error(err);
-      toast.error(err.response?.data?.message || err.message || 'Failed to raise safety alert.');
+      toast.error(
+        err.response?.data?.message ||
+          err.message ||
+          "Failed to raise safety alert.",
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.OPERATIONS_MANAGER, UserRole.SAFETY_OFFICER]}>
+    <RoleGuard
+      allowedRoles={[
+        UserRole.ADMIN,
+        UserRole.OPERATIONS_MANAGER,
+        UserRole.SAFETY_OFFICER,
+      ]}
+    >
       <div className="space-y-6">
         <PageHeader
           title="Safety Alerts"
           subtitle="Monitor and coordinate active safety alerts across all shafts"
           actions={
-            <Button size="sm" variant="destructive" onClick={handleRaiseClick} id="create-alert-btn">
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={handleRaiseClick}
+              id="create-alert-btn"
+            >
               <Plus className="w-4 h-4 mr-1.5" />
               Raise Alert
             </Button>
@@ -184,23 +222,45 @@ export default function SafetyPage() {
         />
 
         <Tabs
-          value={severity || 'all'}
-          onValueChange={(val) => setSeverity(val === 'all' ? undefined : (val.toUpperCase() as AlertSeverity))}
+          value={severity || "all"}
+          onValueChange={(val) =>
+            setSeverity(
+              val === "all" ? undefined : (val.toUpperCase() as AlertSeverity),
+            )
+          }
           className="w-full"
         >
           <div className="flex items-center justify-between gap-4 flex-wrap bg-muted/20 p-1 rounded-lg">
             <TabsList className="bg-background border border-border">
-              <TabsTrigger value="all" className="text-xs">All Severities</TabsTrigger>
-              <TabsTrigger value="critical" className="text-xs text-red-500">Critical</TabsTrigger>
-              <TabsTrigger value="high" className="text-xs text-orange-400">High</TabsTrigger>
-              <TabsTrigger value="medium" className="text-xs text-amber-400">Medium</TabsTrigger>
-              <TabsTrigger value="low" className="text-xs">Low</TabsTrigger>
+              <TabsTrigger value="all" className="text-xs">
+                All Severities
+              </TabsTrigger>
+              <TabsTrigger value="critical" className="text-xs text-red-500">
+                Critical
+              </TabsTrigger>
+              <TabsTrigger value="high" className="text-xs text-orange-400">
+                High
+              </TabsTrigger>
+              <TabsTrigger value="medium" className="text-xs text-amber-400">
+                Medium
+              </TabsTrigger>
+              <TabsTrigger value="low" className="text-xs">
+                Low
+              </TabsTrigger>
             </TabsList>
-            
+
             <div className="flex items-center gap-2">
               <Select
-                value={status || 'active_only'}
-                onValueChange={(val) => setStatus(val === 'all' ? undefined : val === 'active_only' ? undefined : (val as AlertStatus))}
+                value={status || "active_only"}
+                onValueChange={(val) =>
+                  setStatus(
+                    val === "all"
+                      ? undefined
+                      : val === "active_only"
+                        ? undefined
+                        : (val as AlertStatus),
+                  )
+                }
               >
                 <SelectTrigger className="w-[150px] bg-card text-xs h-9">
                   <SelectValue placeholder="Filter Status" />
@@ -217,8 +277,10 @@ export default function SafetyPage() {
               </Select>
 
               <Select
-                value={siteId || 'all'}
-                onValueChange={(val) => setSiteId(val === 'all' || !val ? undefined : val)}
+                value={siteId || "all"}
+                onValueChange={(val) =>
+                  setSiteId(val === "all" || !val ? undefined : val)
+                }
               >
                 <SelectTrigger className="w-[180px] bg-card text-xs h-9">
                   <SelectValue placeholder="All Sites" />
@@ -269,24 +331,40 @@ export default function SafetyPage() {
                 Raise Operational Safety Alert
               </DialogTitle>
               <DialogDescription>
-                Submit a hazard or safety incident alert. All active safety officers will be notified.
+                Submit a hazard or safety incident alert. All active safety
+                officers will be notified.
               </DialogDescription>
             </DialogHeader>
 
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-2">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4 py-2"
+            >
               <div className="space-y-1">
                 <Label htmlFor="title">Incident Title</Label>
-                <Input id="title" {...form.register('title')} placeholder="E.g., High methane leak warning" />
+                <Input
+                  id="title"
+                  {...form.register("title")}
+                  placeholder="E.g., High methane leak warning"
+                />
                 {form.formState.errors.title && (
-                  <p className="text-xs text-destructive">{form.formState.errors.title.message}</p>
+                  <p className="text-xs text-destructive">
+                    {form.formState.errors.title.message}
+                  </p>
                 )}
               </div>
 
               <div className="space-y-1">
                 <Label htmlFor="description">Detailed Description</Label>
-                <Input id="description" {...form.register('description')} placeholder="Detail the hazard and steps taken" />
+                <Input
+                  id="description"
+                  {...form.register("description")}
+                  placeholder="Detail the hazard and steps taken"
+                />
                 {form.formState.errors.description && (
-                  <p className="text-xs text-destructive">{form.formState.errors.description.message}</p>
+                  <p className="text-xs text-destructive">
+                    {form.formState.errors.description.message}
+                  </p>
                 )}
               </div>
 
@@ -294,8 +372,10 @@ export default function SafetyPage() {
                 <div className="space-y-1">
                   <Label htmlFor="severity">Severity Level</Label>
                   <Select
-                    value={form.watch('severity')}
-                    onValueChange={(val) => form.setValue('severity', val! as AlertSeverity)}
+                    value={form.watch("severity")}
+                    onValueChange={(val) =>
+                      form.setValue("severity", val! as AlertSeverity)
+                    }
                   >
                     <SelectTrigger className="w-full bg-card">
                       <SelectValue />
@@ -312,8 +392,8 @@ export default function SafetyPage() {
                 <div className="space-y-1">
                   <Label htmlFor="siteId">Assigned Site</Label>
                   <Select
-                    value={form.watch('siteId')}
-                    onValueChange={(val) => form.setValue('siteId', val!)}
+                    value={form.watch("siteId")}
+                    onValueChange={(val) => form.setValue("siteId", val!)}
                   >
                     <SelectTrigger className="w-full bg-card">
                       <SelectValue placeholder="Select Shaft Site" />
@@ -327,22 +407,39 @@ export default function SafetyPage() {
                     </SelectContent>
                   </Select>
                   {form.formState.errors.siteId && (
-                    <p className="text-xs text-destructive">{form.formState.errors.siteId.message}</p>
+                    <p className="text-xs text-destructive">
+                      {form.formState.errors.siteId.message}
+                    </p>
                   )}
                 </div>
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="location">Specific Location details (Optional)</Label>
-                <Input id="location" {...form.register('location')} placeholder="E.g., Sector 4 North Wall Ventilation" />
+                <Label htmlFor="location">
+                  Specific Location details (Optional)
+                </Label>
+                <Input
+                  id="location"
+                  {...form.register("location")}
+                  placeholder="E.g., Sector 4 North Wall Ventilation"
+                />
               </div>
 
               <DialogFooter className="mt-6">
-                <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)} disabled={isSubmitting}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsFormOpen(false)}
+                  disabled={isSubmitting}
+                >
                   Cancel
                 </Button>
-                <Button type="submit" variant="destructive" disabled={isSubmitting}>
-                  {isSubmitting ? 'Raising Alert...' : 'Raise Alert'}
+                <Button
+                  type="submit"
+                  variant="destructive"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Raising Alert..." : "Raise Alert"}
                 </Button>
               </DialogFooter>
             </form>
@@ -358,13 +455,16 @@ export default function SafetyPage() {
                 Resolve Incident Alert
               </DialogTitle>
               <DialogDescription>
-                Provide notes outlining the actions taken to mitigate this safety hazard.
+                Provide notes outlining the actions taken to mitigate this
+                safety hazard.
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4 py-2">
               <div className="space-y-1">
-                <Label htmlFor="resolutionNotes">Mitigation / Resolution Notes</Label>
+                <Label htmlFor="resolutionNotes">
+                  Mitigation / Resolution Notes
+                </Label>
                 <Input
                   id="resolutionNotes"
                   value={resolutionNotes}
@@ -375,11 +475,18 @@ export default function SafetyPage() {
             </div>
 
             <DialogFooter className="mt-4">
-              <Button variant="outline" onClick={() => setIsResolveOpen(false)} disabled={isSubmitting}>
+              <Button
+                variant="outline"
+                onClick={() => setIsResolveOpen(false)}
+                disabled={isSubmitting}
+              >
                 Cancel
               </Button>
-              <Button onClick={handleResolveSubmit} disabled={isSubmitting || !resolutionNotes.trim()}>
-                {isSubmitting ? 'Resolving...' : 'Resolve Alert'}
+              <Button
+                onClick={handleResolveSubmit}
+                disabled={isSubmitting || !resolutionNotes.trim()}
+              >
+                {isSubmitting ? "Resolving..." : "Resolve Alert"}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -394,16 +501,27 @@ export default function SafetyPage() {
                 <DialogTitle>Confirm Delete</DialogTitle>
               </div>
               <DialogDescription>
-                Are you sure you want to delete <span className="font-semibold text-foreground">{selectedAlert?.title}</span>?
-                This deletes the alert record completely.
+                Are you sure you want to delete{" "}
+                <span className="font-semibold text-foreground">
+                  {selectedAlert?.title}
+                </span>
+                ? This deletes the alert record completely.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="mt-4">
-              <Button variant="outline" onClick={() => setIsDeleteOpen(false)} disabled={isSubmitting}>
+              <Button
+                variant="outline"
+                onClick={() => setIsDeleteOpen(false)}
+                disabled={isSubmitting}
+              >
                 Cancel
               </Button>
-              <Button variant="destructive" onClick={confirmDelete} disabled={isSubmitting}>
-                {isSubmitting ? 'Deleting...' : 'Delete'}
+              <Button
+                variant="destructive"
+                onClick={confirmDelete}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Deleting..." : "Delete"}
               </Button>
             </DialogFooter>
           </DialogContent>

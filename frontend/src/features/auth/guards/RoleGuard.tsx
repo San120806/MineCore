@@ -3,13 +3,13 @@
 // Restricts rendering based on user roles and displays a premium access denied page.
 // ─────────────────────────────────────────────────────────────────────────────
 
-'use client';
+"use client";
 
-import React from 'react';
-import { useAuth } from '../hooks/useAuth';
-import { UserRole } from '@/types/enums';
-import { EmptyState } from '@/components/shared/EmptyState';
-import { ShieldAlert } from 'lucide-react';
+import React from "react";
+import { useAuth } from "../hooks/useAuth";
+import { UserRole } from "@/types/enums";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { ShieldAlert } from "lucide-react";
 
 interface RoleGuardProps {
   children: React.ReactNode;
@@ -17,7 +17,11 @@ interface RoleGuardProps {
   fallback?: React.ReactNode;
 }
 
-export function RoleGuard({ children, allowedRoles, fallback }: RoleGuardProps) {
+export function RoleGuard({
+  children,
+  allowedRoles,
+  fallback,
+}: RoleGuardProps) {
   const { user, isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
@@ -39,7 +43,7 @@ export function RoleGuard({ children, allowedRoles, fallback }: RoleGuardProps) 
         <EmptyState
           icon={ShieldAlert}
           title="Access Denied"
-          description={`Your account role (${user.role.replace('_', ' ')}) does not have permission to access this module.`}
+          description={`Your account role (${user.role.replace("_", " ")}) does not have permission to access this module.`}
         />
       </div>
     );

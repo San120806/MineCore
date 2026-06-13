@@ -2,7 +2,7 @@
 // MineCore — Maintenance Record Types
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { MaintenanceType, MaintenanceStatus } from './enums';
+import { MaintenanceType, MaintenanceStatus } from "./enums";
 
 export interface MaintenanceRecord {
   id: string;

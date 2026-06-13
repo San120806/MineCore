@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MineCore — Sidebar Navigation Items
@@ -15,9 +15,9 @@ import {
   BarChart3,
   Settings,
   type LucideIcon,
-} from 'lucide-react';
-import { ROUTES } from './routes';
-import { UserRole } from '@/types/enums';
+} from "lucide-react";
+import { ROUTES } from "./routes";
+import { UserRole } from "@/types/enums";
 
 export interface NavItem {
   label: string;
@@ -37,37 +37,37 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     items: [
       {
-        label: 'Dashboard',
+        label: "Dashboard",
         href: ROUTES.DASHBOARD,
         icon: LayoutDashboard,
       },
     ],
   },
   {
-    title: 'Operations',
+    title: "Operations",
     items: [
       {
-        label: 'Mining Sites',
+        label: "Mining Sites",
         href: ROUTES.SITES,
         icon: MapPin,
       },
       {
-        label: 'Vehicles',
+        label: "Vehicles",
         href: ROUTES.VEHICLES,
         icon: Truck,
       },
       {
-        label: 'Sensors',
+        label: "Sensors",
         href: ROUTES.SENSORS,
         icon: Radio,
       },
     ],
   },
   {
-    title: 'Safety & Maintenance',
+    title: "Safety & Maintenance",
     items: [
       {
-        label: 'Safety Alerts',
+        label: "Safety Alerts",
         href: ROUTES.SAFETY,
         icon: ShieldAlert,
         allowedRoles: [
@@ -77,12 +77,12 @@ export const NAV_SECTIONS: NavSection[] = [
         ],
       },
       {
-        label: 'Equipment',
+        label: "Equipment",
         href: ROUTES.EQUIPMENT,
         icon: Cog,
       },
       {
-        label: 'Maintenance',
+        label: "Maintenance",
         href: ROUTES.MAINTENANCE,
         icon: Wrench,
         allowedRoles: [
@@ -94,20 +94,20 @@ export const NAV_SECTIONS: NavSection[] = [
     ],
   },
   {
-    title: 'Intelligence',
+    title: "Intelligence",
     items: [
       {
-        label: 'Analytics',
+        label: "Analytics",
         href: ROUTES.ANALYTICS,
         icon: BarChart3,
       },
     ],
   },
   {
-    title: 'System',
+    title: "System",
     items: [
       {
-        label: 'Settings',
+        label: "Settings",
         href: ROUTES.SETTINGS,
         icon: Settings,
       },

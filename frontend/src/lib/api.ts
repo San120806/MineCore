@@ -3,9 +3,13 @@
 // Standard configured client with token injection and auto-refresh interceptors.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { API_BASE_URL, API_PREFIX, API_ENDPOINTS } from '@/constants/api';
-import { getTokens, setTokens, clearTokens } from '@/features/auth/services/token.service';
+import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
+import { API_BASE_URL, API_PREFIX, API_ENDPOINTS } from "@/constants/api";
+import {
+  getTokens,
+  setTokens,
+  clearTokens,
+} from "@/features/auth/services/token.service";
 
 interface QueueItem {
   resolve: (value: unknown) => void;
@@ -30,7 +34,7 @@ const processQueue = (error: Error | null, token: string | null = null) => {
 const apiClient = axios.create({
   baseURL: `${API_BASE_URL}${API_PREFIX}`,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
   timeout: 15_000,
 });
@@ -51,22 +55,28 @@ apiClient.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 // Response Interceptor: auto-refresh expired tokens
 apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+    const originalRequest = error.config as InternalAxiosRequestConfig & {
+      _retry?: boolean;
+    };
 
     // If response status is 401 and we haven't retried this request yet
-    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry
+    ) {
       // Prevent infinite loops if the refresh call itself returns 401
       if (originalRequest.url === API_ENDPOINTS.AUTH.REFRESH) {
         clearTokens();
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login?expired=true';
+        if (typeof window !== "undefined") {
+          window.location.href = "/login?expired=true";
         }
         return Promise.reject(error);
       }
@@ -77,8 +87,8 @@ apiClient.interceptors.response.use(
       if (!refreshToken) {
         // No refresh token available, clear state and redirect to login
         clearTokens();
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login';
+        if (typeof window !== "undefined") {
+          window.location.href = "/login";
         }
         return Promise.reject(error);
       }
@@ -104,10 +114,11 @@ apiClient.interceptors.response.use(
         // Call the refresh endpoint directly to get a new access token
         const refreshResponse = await axios.post(
           `${API_BASE_URL}${API_PREFIX}${API_ENDPOINTS.AUTH.REFRESH}`,
-          { refreshToken }
+          { refreshToken },
         );
 
-        const { accessToken: newAccessToken, refreshToken: newRefreshToken } = refreshResponse.data.data;
+        const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
+          refreshResponse.data.data;
         setTokens(newAccessToken, newRefreshToken);
 
         // Process all queued requests
@@ -122,8 +133,8 @@ apiClient.interceptors.response.use(
         // Refresh token failed, perform logout cleanup
         processQueue(refreshError, null);
         clearTokens();
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login?expired=true';
+        if (typeof window !== "undefined") {
+          window.location.href = "/login?expired=true";
         }
         return Promise.reject(refreshError);
       } finally {
@@ -132,7 +143,7 @@ apiClient.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default apiClient;

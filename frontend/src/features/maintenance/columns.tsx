@@ -2,66 +2,70 @@
 // MineCore — Maintenance Table Column Definitions
 // ─────────────────────────────────────────────────────────────────────────────
 
-import type { ColumnDef } from '@tanstack/react-table';
-import type { MaintenanceRecord } from '@/types/maintenance';
-import { StatusBadge } from '@/components/shared/StatusBadge';
-import { MAINTENANCE_TYPE_LABELS } from '@/constants/enums';
-import { formatDate, formatCurrency, truncate } from '@/lib/utils';
+import type { ColumnDef } from "@tanstack/react-table";
+import type { MaintenanceRecord } from "@/types/maintenance";
+import { StatusBadge } from "@/components/shared/StatusBadge";
+import { MAINTENANCE_TYPE_LABELS } from "@/constants/enums";
+import { formatDate, formatCurrency, truncate } from "@/lib/utils";
 
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Edit, Trash, CheckSquare } from 'lucide-react';
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { MoreHorizontal, Edit, Trash, CheckSquare } from "lucide-react";
 
 export const maintenanceColumns: ColumnDef<MaintenanceRecord, unknown>[] = [
   {
-    accessorKey: 'type',
-    header: 'Type',
-    cell: ({ getValue }) => (
-      <StatusBadge value={String(getValue())} />
-    ),
+    accessorKey: "type",
+    header: "Type",
+    cell: ({ getValue }) => <StatusBadge value={String(getValue())} />,
     enableSorting: true,
   },
   {
-    accessorKey: 'issue',
-    header: 'Issue',
+    accessorKey: "issue",
+    header: "Issue",
     cell: ({ getValue }) => (
       <span className="text-sm">{truncate(String(getValue()), 60)}</span>
     ),
     enableSorting: false,
   },
   {
-    accessorKey: 'equipment',
-    header: 'Equipment',
+    accessorKey: "equipment",
+    header: "Equipment",
     cell: ({ row }) => (
       <div>
-        <p className="text-sm font-medium">{row.original.equipment?.name ?? '—'}</p>
-        <p className="text-xs text-muted-foreground">{row.original.equipment?.site?.name ?? ''}</p>
+        <p className="text-sm font-medium">
+          {row.original.equipment?.name ?? "—"}
+        </p>
+        <p className="text-xs text-muted-foreground">
+          {row.original.equipment?.site?.name ?? ""}
+        </p>
       </div>
     ),
     enableSorting: false,
   },
   {
-    accessorKey: 'status',
-    header: 'Status',
+    accessorKey: "status",
+    header: "Status",
     cell: ({ getValue }) => <StatusBadge value={String(getValue())} />,
     enableSorting: true,
   },
   {
-    accessorKey: 'performedBy',
-    header: 'Technician',
+    accessorKey: "performedBy",
+    header: "Technician",
     cell: ({ row }) => (
-      <span className="text-sm text-muted-foreground">{row.original.performedBy?.name ?? '—'}</span>
+      <span className="text-sm text-muted-foreground">
+        {row.original.performedBy?.name ?? "—"}
+      </span>
     ),
     enableSorting: false,
   },
   {
-    accessorKey: 'maintenanceDate',
-    header: 'Date',
+    accessorKey: "maintenanceDate",
+    header: "Date",
     cell: ({ getValue }) => (
       <span className="text-xs text-muted-foreground tabular-nums">
         {formatDate(getValue() as string)}
@@ -70,20 +74,22 @@ export const maintenanceColumns: ColumnDef<MaintenanceRecord, unknown>[] = [
     enableSorting: true,
   },
   {
-    accessorKey: 'cost',
-    header: 'Cost',
+    accessorKey: "cost",
+    header: "Cost",
     cell: ({ getValue }) => (
-      <span className="text-sm tabular-nums">{formatCurrency(getValue() as number | null | undefined)}</span>
+      <span className="text-sm tabular-nums">
+        {formatCurrency(getValue() as number | null | undefined)}
+      </span>
     ),
     enableSorting: true,
   },
   {
-    id: 'actions',
-    header: '',
+    id: "actions",
+    header: "",
     cell: ({ row, table }) => {
       const record = row.original;
       const meta = table.options.meta as any;
-      const isCompleted = record.status === 'COMPLETED';
+      const isCompleted = record.status === "COMPLETED";
 
       return (
         <DropdownMenu>

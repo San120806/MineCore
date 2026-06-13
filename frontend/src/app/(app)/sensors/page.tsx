@@ -1,22 +1,26 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { PageHeader } from '@/components/layout/PageHeader';
-import { Button } from '@/components/ui/button';
-import { Plus, Search, Filter, AlertTriangle } from 'lucide-react';
-import { DataTable } from '@/components/tables/DataTable';
-import { SearchBar } from '@/components/tables/SearchBar';
-import { sensorColumns } from '@/features/sensors/columns';
-import { RoleGuard } from '@/features/auth/guards/RoleGuard';
-import { UserRole, SensorStatus, SensorType } from '@/types/enums';
-import { useSensors } from '@/features/sensors/hooks';
-import { getSites } from '@/services/sites.service';
-import { createSensor, updateSensor, deleteSensor } from '@/services/sensors.service';
-import type { MiningSite } from '@/types/site';
-import { toast } from 'sonner';
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { Button } from "@/components/ui/button";
+import { Plus, Search, Filter, AlertTriangle } from "lucide-react";
+import { DataTable } from "@/components/tables/DataTable";
+import { SearchBar } from "@/components/tables/SearchBar";
+import { sensorColumns } from "@/features/sensors/columns";
+import { RoleGuard } from "@/features/auth/guards/RoleGuard";
+import { UserRole, SensorStatus, SensorType } from "@/types/enums";
+import { useSensors } from "@/features/sensors/hooks";
+import { getSites } from "@/services/sites.service";
+import {
+  createSensor,
+  updateSensor,
+  deleteSensor,
+} from "@/services/sensors.service";
+import type { MiningSite } from "@/types/site";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -24,18 +28,24 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-import { SENSOR_TYPE_LABELS } from '@/constants/enums';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { SENSOR_TYPE_LABELS } from "@/constants/enums";
 
 const sensorFormSchema = z.object({
-  siteId: z.string().min(1, 'Site assignment is required'),
-  sensorCode: z.string().min(2, 'Sensor code must be at least 2 characters'),
-  name: z.string().min(2, 'Sensor name must be at least 2 characters'),
+  siteId: z.string().min(1, "Site assignment is required"),
+  sensorCode: z.string().min(2, "Sensor code must be at least 2 characters"),
+  name: z.string().min(2, "Sensor name must be at least 2 characters"),
   sensorType: z.nativeEnum(SensorType),
-  unit: z.string().min(1, 'Measurement unit is required'),
+  unit: z.string().min(1, "Measurement unit is required"),
   status: z.nativeEnum(SensorStatus),
   thresholdMin: z.number().optional(),
   thresholdMax: z.number().optional(),
@@ -72,17 +82,17 @@ export default function SensorsPage() {
     // Fetch sites for forms and filters
     getSites({ limit: 100 })
       .then((res) => setSites(res.data))
-      .catch((err) => console.error('Error fetching sites:', err));
+      .catch((err) => console.error("Error fetching sites:", err));
   }, []);
 
   const form = useForm<SensorFormValues>({
     resolver: zodResolver(sensorFormSchema),
     defaultValues: {
-      siteId: '',
-      sensorCode: '',
-      name: '',
+      siteId: "",
+      sensorCode: "",
+      name: "",
       sensorType: SensorType.TEMPERATURE,
-      unit: '°C',
+      unit: "°C",
       status: SensorStatus.ONLINE,
       thresholdMin: undefined,
       thresholdMax: undefined,
@@ -90,24 +100,24 @@ export default function SensorsPage() {
   });
 
   // Automatically update unit placeholder when type changes
-  const watchedType = form.watch('sensorType');
+  const watchedType = form.watch("sensorType");
   useEffect(() => {
     if (!selectedSensor) {
       switch (watchedType) {
         case SensorType.TEMPERATURE:
-          form.setValue('unit', '°C');
+          form.setValue("unit", "°C");
           break;
         case SensorType.PRESSURE:
-          form.setValue('unit', 'kPa');
+          form.setValue("unit", "kPa");
           break;
         case SensorType.VIBRATION:
-          form.setValue('unit', 'mm/s');
+          form.setValue("unit", "mm/s");
           break;
         case SensorType.AIR_QUALITY:
-          form.setValue('unit', 'ppm');
+          form.setValue("unit", "ppm");
           break;
         case SensorType.HUMIDITY:
-          form.setValue('unit', '%');
+          form.setValue("unit", "%");
           break;
       }
     }
@@ -116,11 +126,11 @@ export default function SensorsPage() {
   const handleCreateClick = () => {
     setSelectedSensor(null);
     form.reset({
-      siteId: sites[0]?.id || '',
-      sensorCode: '',
-      name: '',
+      siteId: sites[0]?.id || "",
+      sensorCode: "",
+      name: "",
       sensorType: SensorType.TEMPERATURE,
-      unit: '°C',
+      unit: "°C",
       status: SensorStatus.ONLINE,
       thresholdMin: 0,
       thresholdMax: 100,
@@ -153,16 +163,20 @@ export default function SensorsPage() {
     try {
       if (selectedSensor) {
         await updateSensor(selectedSensor.id, values);
-        toast.success('Sensor updated successfully');
+        toast.success("Sensor updated successfully");
       } else {
         await createSensor(values);
-        toast.success('Sensor created successfully');
+        toast.success("Sensor created successfully");
       }
       setIsFormOpen(false);
       refetch();
     } catch (err: any) {
       console.error(err);
-      toast.error(err.response?.data?.message || err.message || 'Error occurred saving sensor.');
+      toast.error(
+        err.response?.data?.message ||
+          err.message ||
+          "Error occurred saving sensor.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -173,25 +187,39 @@ export default function SensorsPage() {
     setIsSubmitting(true);
     try {
       await deleteSensor(selectedSensor.id);
-      toast.success('Sensor deleted successfully');
+      toast.success("Sensor deleted successfully");
       setIsDeleteOpen(false);
       refetch();
     } catch (err: any) {
       console.error(err);
-      toast.error(err.response?.data?.message || err.message || 'Failed to delete sensor.');
+      toast.error(
+        err.response?.data?.message ||
+          err.message ||
+          "Failed to delete sensor.",
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <RoleGuard allowedRoles={[UserRole.ADMIN, UserRole.OPERATIONS_MANAGER, UserRole.SAFETY_OFFICER]}>
+    <RoleGuard
+      allowedRoles={[
+        UserRole.ADMIN,
+        UserRole.OPERATIONS_MANAGER,
+        UserRole.SAFETY_OFFICER,
+      ]}
+    >
       <div className="space-y-6">
         <PageHeader
           title="IoT Sensors"
           subtitle="Monitor all site telemetry sensors in real time"
           actions={
-            <Button size="sm" onClick={handleCreateClick} id="create-sensor-btn">
+            <Button
+              size="sm"
+              onClick={handleCreateClick}
+              id="create-sensor-btn"
+            >
               <Plus className="w-4 h-4 mr-1.5" />
               Add Sensor
             </Button>
@@ -208,8 +236,10 @@ export default function SensorsPage() {
 
           <div className="flex flex-wrap items-center gap-2">
             <Select
-              value={status || 'all'}
-              onValueChange={(val) => setStatus(val === 'all' ? undefined : (val as SensorStatus))}
+              value={status || "all"}
+              onValueChange={(val) =>
+                setStatus(val === "all" ? undefined : (val as SensorStatus))
+              }
             >
               <SelectTrigger className="w-[150px] bg-card">
                 <SelectValue placeholder="All Statuses" />
@@ -225,8 +255,10 @@ export default function SensorsPage() {
             </Select>
 
             <Select
-              value={sensorType || 'all'}
-              onValueChange={(val) => setSensorType(val === 'all' ? undefined : (val as SensorType))}
+              value={sensorType || "all"}
+              onValueChange={(val) =>
+                setSensorType(val === "all" ? undefined : (val as SensorType))
+              }
             >
               <SelectTrigger className="w-[160px] bg-card">
                 <SelectValue placeholder="All Types" />
@@ -242,8 +274,10 @@ export default function SensorsPage() {
             </Select>
 
             <Select
-              value={siteId || 'all'}
-              onValueChange={(val) => setSiteId(val === 'all' || !val ? undefined : val)}
+              value={siteId || "all"}
+              onValueChange={(val) =>
+                setSiteId(val === "all" || !val ? undefined : val)
+              }
             >
               <SelectTrigger className="w-[180px] bg-card">
                 <SelectValue placeholder="All Sites" />
@@ -280,28 +314,45 @@ export default function SensorsPage() {
         <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>{selectedSensor ? 'Edit Sensor' : 'Add Telemetry Sensor'}</DialogTitle>
+              <DialogTitle>
+                {selectedSensor ? "Edit Sensor" : "Add Telemetry Sensor"}
+              </DialogTitle>
               <DialogDescription>
                 {selectedSensor
-                  ? 'Update the telemetry bounds and parameters for this sensor.'
-                  : 'Register a new telemetry node on a shaft site.'}
+                  ? "Update the telemetry bounds and parameters for this sensor."
+                  : "Register a new telemetry node on a shaft site."}
               </DialogDescription>
             </DialogHeader>
 
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-2">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4 py-2"
+            >
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <Label htmlFor="sensorCode">Sensor Code</Label>
-                  <Input id="sensorCode" {...form.register('sensorCode')} placeholder="E.g., TEMP-101" />
+                  <Input
+                    id="sensorCode"
+                    {...form.register("sensorCode")}
+                    placeholder="E.g., TEMP-101"
+                  />
                   {form.formState.errors.sensorCode && (
-                    <p className="text-xs text-destructive">{form.formState.errors.sensorCode.message}</p>
+                    <p className="text-xs text-destructive">
+                      {form.formState.errors.sensorCode.message}
+                    </p>
                   )}
                 </div>
                 <div className="space-y-1">
                   <Label htmlFor="name">Sensor Name</Label>
-                  <Input id="name" {...form.register('name')} placeholder="E.g., Shaft 1 Vent Temp" />
+                  <Input
+                    id="name"
+                    {...form.register("name")}
+                    placeholder="E.g., Shaft 1 Vent Temp"
+                  />
                   {form.formState.errors.name && (
-                    <p className="text-xs text-destructive">{form.formState.errors.name.message}</p>
+                    <p className="text-xs text-destructive">
+                      {form.formState.errors.name.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -310,8 +361,10 @@ export default function SensorsPage() {
                 <div className="space-y-1">
                   <Label htmlFor="sensorType">Sensor Type</Label>
                   <Select
-                    value={form.watch('sensorType')}
-                    onValueChange={(val) => form.setValue('sensorType', val! as SensorType)}
+                    value={form.watch("sensorType")}
+                    onValueChange={(val) =>
+                      form.setValue("sensorType", val! as SensorType)
+                    }
                   >
                     <SelectTrigger className="w-full bg-card">
                       <SelectValue />
@@ -327,9 +380,11 @@ export default function SensorsPage() {
                 </div>
                 <div className="space-y-1">
                   <Label htmlFor="unit">Unit of Measure</Label>
-                  <Input id="unit" {...form.register('unit')} />
+                  <Input id="unit" {...form.register("unit")} />
                   {form.formState.errors.unit && (
-                    <p className="text-xs text-destructive">{form.formState.errors.unit.message}</p>
+                    <p className="text-xs text-destructive">
+                      {form.formState.errors.unit.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -338,8 +393,10 @@ export default function SensorsPage() {
                 <div className="space-y-1">
                   <Label htmlFor="status">Status</Label>
                   <Select
-                    value={form.watch('status')}
-                    onValueChange={(val) => form.setValue('status', val! as SensorStatus)}
+                    value={form.watch("status")}
+                    onValueChange={(val) =>
+                      form.setValue("status", val! as SensorStatus)
+                    }
                   >
                     <SelectTrigger className="w-full bg-card">
                       <SelectValue />
@@ -356,8 +413,8 @@ export default function SensorsPage() {
                 <div className="space-y-1">
                   <Label htmlFor="siteId">Assigned Site</Label>
                   <Select
-                    value={form.watch('siteId')}
-                    onValueChange={(val) => form.setValue('siteId', val!)}
+                    value={form.watch("siteId")}
+                    onValueChange={(val) => form.setValue("siteId", val!)}
                   >
                     <SelectTrigger className="w-full bg-card">
                       <SelectValue placeholder="Select Shaft Site" />
@@ -371,7 +428,9 @@ export default function SensorsPage() {
                     </SelectContent>
                   </Select>
                   {form.formState.errors.siteId && (
-                    <p className="text-xs text-destructive">{form.formState.errors.siteId.message}</p>
+                    <p className="text-xs text-destructive">
+                      {form.formState.errors.siteId.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -379,20 +438,35 @@ export default function SensorsPage() {
               <div className="grid grid-cols-2 gap-4 border-t border-border/40 pt-3">
                 <div className="space-y-1">
                   <Label htmlFor="thresholdMin">Warning Min Bound</Label>
-                  <Input id="thresholdMin" type="number" step="any" {...form.register('thresholdMin', { valueAsNumber: true })} />
+                  <Input
+                    id="thresholdMin"
+                    type="number"
+                    step="any"
+                    {...form.register("thresholdMin", { valueAsNumber: true })}
+                  />
                 </div>
                 <div className="space-y-1">
                   <Label htmlFor="thresholdMax">Warning Max Bound</Label>
-                  <Input id="thresholdMax" type="number" step="any" {...form.register('thresholdMax', { valueAsNumber: true })} />
+                  <Input
+                    id="thresholdMax"
+                    type="number"
+                    step="any"
+                    {...form.register("thresholdMax", { valueAsNumber: true })}
+                  />
                 </div>
               </div>
 
               <DialogFooter className="mt-6">
-                <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)} disabled={isSubmitting}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsFormOpen(false)}
+                  disabled={isSubmitting}
+                >
                   Cancel
                 </Button>
                 <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? 'Saving...' : 'Save Sensor'}
+                  {isSubmitting ? "Saving..." : "Save Sensor"}
                 </Button>
               </DialogFooter>
             </form>
@@ -408,16 +482,27 @@ export default function SensorsPage() {
                 <DialogTitle>Confirm Delete</DialogTitle>
               </div>
               <DialogDescription>
-                Are you sure you want to delete <span className="font-semibold text-foreground">{selectedSensor?.name}</span>?
-                This action cannot be undone.
+                Are you sure you want to delete{" "}
+                <span className="font-semibold text-foreground">
+                  {selectedSensor?.name}
+                </span>
+                ? This action cannot be undone.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="mt-4">
-              <Button variant="outline" onClick={() => setIsDeleteOpen(false)} disabled={isSubmitting}>
+              <Button
+                variant="outline"
+                onClick={() => setIsDeleteOpen(false)}
+                disabled={isSubmitting}
+              >
                 Cancel
               </Button>
-              <Button variant="destructive" onClick={confirmDelete} disabled={isSubmitting}>
-                {isSubmitting ? 'Deleting...' : 'Delete'}
+              <Button
+                variant="destructive"
+                onClick={confirmDelete}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Deleting..." : "Delete"}
               </Button>
             </DialogFooter>
           </DialogContent>

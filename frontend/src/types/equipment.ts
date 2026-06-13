@@ -2,8 +2,8 @@
 // MineCore — Equipment Types
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { EquipmentType, EquipmentStatus } from './enums';
-import { MaintenanceRecord } from './maintenance';
+import { EquipmentType, EquipmentStatus } from "./enums";
+import { MaintenanceRecord } from "./maintenance";
 
 export interface Equipment {
   id: string;

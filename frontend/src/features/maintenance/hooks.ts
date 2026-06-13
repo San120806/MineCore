@@ -1,8 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
-import { getMaintenanceList } from '@/services/maintenance.service';
-import type { MaintenanceRecord, MaintenanceQueryParams } from '@/types/maintenance';
-import { useDebounce } from '@/hooks/useDebounce';
-import { MaintenanceStatus, MaintenanceType } from '@/types/enums';
+import { useState, useEffect, useCallback } from "react";
+import { getMaintenanceList } from "@/services/maintenance.service";
+import type {
+  MaintenanceRecord,
+  MaintenanceQueryParams,
+} from "@/types/maintenance";
+import { useDebounce } from "@/hooks/useDebounce";
+import { MaintenanceStatus, MaintenanceType } from "@/types/enums";
 
 export function useMaintenance() {
   const [data, setData] = useState<MaintenanceRecord[]>([]);
@@ -11,8 +14,10 @@ export function useMaintenance() {
   const [error, setError] = useState<string | null>(null);
 
   // Filter and pagination state
-  const [search, setSearch] = useState<string>('');
-  const [status, setStatus] = useState<MaintenanceStatus | undefined>(undefined);
+  const [search, setSearch] = useState<string>("");
+  const [status, setStatus] = useState<MaintenanceStatus | undefined>(
+    undefined,
+  );
   const [type, setType] = useState<MaintenanceType | undefined>(undefined);
   const [equipmentId, setEquipmentId] = useState<string | undefined>(undefined);
   const [page, setPage] = useState<number>(1);
@@ -36,8 +41,12 @@ export function useMaintenance() {
       setData(response.data);
       setTotalCount(response.meta.total);
     } catch (err: any) {
-      console.error('Error fetching maintenance:', err);
-      setError(err.response?.data?.message || err.message || 'Failed to load maintenance records');
+      console.error("Error fetching maintenance:", err);
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Failed to load maintenance records",
+      );
     } finally {
       setIsLoading(false);
     }
