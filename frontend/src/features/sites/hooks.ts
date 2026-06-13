@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
-import { getSites } from '@/services/sites.service';
-import type { MiningSite, SiteQueryParams } from '@/types/site';
-import { useDebounce } from '@/hooks/useDebounce';
+import { useState, useEffect, useCallback } from "react";
+import { getSites } from "@/services/sites.service";
+import type { MiningSite, SiteQueryParams } from "@/types/site";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export function useSites() {
   const [data, setData] = useState<MiningSite[]>([]);
@@ -10,7 +10,7 @@ export function useSites() {
   const [error, setError] = useState<string | null>(null);
 
   // Filter and pagination state
-  const [search, setSearch] = useState<string>('');
+  const [search, setSearch] = useState<string>("");
   const [status, setStatus] = useState<any>(undefined);
   const [page, setPage] = useState<number>(1);
   const [pageSize] = useState<number>(10);
@@ -31,8 +31,10 @@ export function useSites() {
       setData(response.data);
       setTotalCount(response.meta.total);
     } catch (err: any) {
-      console.error('Error fetching sites:', err);
-      setError(err.response?.data?.message || err.message || 'Failed to load sites');
+      console.error("Error fetching sites:", err);
+      setError(
+        err.response?.data?.message || err.message || "Failed to load sites",
+      );
     } finally {
       setIsLoading(false);
     }

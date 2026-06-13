@@ -2,7 +2,7 @@
 // MineCore — Mining Site Types
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { SiteStatus } from './enums';
+import { SiteStatus } from "./enums";
 
 export interface MiningSite {
   id: string;

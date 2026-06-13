@@ -4,35 +4,35 @@
 
 export const ROUTES = {
   // Auth
-  LOGIN: '/login',
+  LOGIN: "/login",
 
   // App
-  DASHBOARD: '/dashboard',
+  DASHBOARD: "/dashboard",
 
   // Sites
-  SITES: '/sites',
+  SITES: "/sites",
   SITE_DETAIL: (id: string) => `/sites/${id}`,
 
   // Vehicles
-  VEHICLES: '/vehicles',
+  VEHICLES: "/vehicles",
 
   // Sensors
-  SENSORS: '/sensors',
+  SENSORS: "/sensors",
 
   // Safety
-  SAFETY: '/safety',
+  SAFETY: "/safety",
 
   // Equipment
-  EQUIPMENT: '/equipment',
+  EQUIPMENT: "/equipment",
 
   // Maintenance
-  MAINTENANCE: '/maintenance',
+  MAINTENANCE: "/maintenance",
 
   // Analytics
-  ANALYTICS: '/analytics',
+  ANALYTICS: "/analytics",
 
   // Settings
-  SETTINGS: '/settings',
+  SETTINGS: "/settings",
 } as const;
 
 export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES];

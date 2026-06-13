@@ -2,9 +2,9 @@
 // MineCore — ErrorState Component
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { AlertTriangle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { AlertTriangle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface ErrorStateProps {
   title?: string;
@@ -14,15 +14,15 @@ interface ErrorStateProps {
 }
 
 export function ErrorState({
-  title = 'Something went wrong',
-  description = 'Failed to load data. Please try again.',
+  title = "Something went wrong",
+  description = "Failed to load data. Please try again.",
   onRetry,
   className,
 }: ErrorStateProps) {
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center py-16 px-6 text-center',
+        "flex flex-col items-center justify-center py-16 px-6 text-center",
         className,
       )}
     >

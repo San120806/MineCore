@@ -3,12 +3,12 @@
 // Fetches operational metadata in parallel to calculate KPI aggregates.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { getSites } from './sites.service';
-import { getVehicles } from './vehicles.service';
-import { getSensors } from './sensors.service';
-import { getAlerts } from './alerts.service';
-import { getEquipmentList } from './equipment.service';
-import { VehicleStatus, SensorStatus, AlertStatus } from '@/types/enums';
+import { getSites } from "./sites.service";
+import { getVehicles } from "./vehicles.service";
+import { getSensors } from "./sensors.service";
+import { getAlerts } from "./alerts.service";
+import { getEquipmentList } from "./equipment.service";
+import { VehicleStatus, SensorStatus, AlertStatus } from "@/types/enums";
 
 export interface DashboardStats {
   sitesCount: number;
@@ -41,8 +41,12 @@ export const getDashboardData = async (): Promise<DashboardStats> => {
 
   // Compute average health score for equipment
   const equipment = equipmentRes.data || [];
-  const totalHealth = equipment.reduce((sum, item) => sum + (item.healthScore ?? 0), 0);
-  const avgHealth = equipment.length > 0 ? Math.round(totalHealth / equipment.length) : 0;
+  const totalHealth = equipment.reduce(
+    (sum, item) => sum + (item.healthScore ?? 0),
+    0,
+  );
+  const avgHealth =
+    equipment.length > 0 ? Math.round(totalHealth / equipment.length) : 0;
 
   return {
     sitesCount: sitesRes.meta.total,

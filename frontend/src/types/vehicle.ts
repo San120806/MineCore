@@ -2,7 +2,7 @@
 // MineCore — Vehicle Types
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { VehicleType, VehicleStatus } from './enums';
+import { VehicleType, VehicleStatus } from "./enums";
 
 export interface Vehicle {
   id: string;

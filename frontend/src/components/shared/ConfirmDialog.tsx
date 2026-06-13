@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MineCore — ConfirmDialog Component
@@ -14,8 +14,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/alert-dialog";
+import { cn } from "@/lib/utils";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -32,10 +32,10 @@ interface ConfirmDialogProps {
 export function ConfirmDialog({
   open,
   onOpenChange,
-  title = 'Are you sure?',
-  description = 'This action cannot be undone.',
-  confirmLabel = 'Confirm',
-  cancelLabel = 'Cancel',
+  title = "Are you sure?",
+  description = "This action cannot be undone.",
+  confirmLabel = "Confirm",
+  cancelLabel = "Cancel",
   onConfirm,
   isDestructive = true,
   isLoading = false,
@@ -48,13 +48,18 @@ export function ConfirmDialog({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>{cancelLabel}</AlertDialogCancel>
+          <AlertDialogCancel disabled={isLoading}>
+            {cancelLabel}
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
             disabled={isLoading}
-            className={cn(isDestructive && 'bg-destructive hover:bg-destructive/90 text-white')}
+            className={cn(
+              isDestructive &&
+                "bg-destructive hover:bg-destructive/90 text-white",
+            )}
           >
-            {isLoading ? 'Processing…' : confirmLabel}
+            {isLoading ? "Processing…" : confirmLabel}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

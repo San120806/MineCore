@@ -2,7 +2,7 @@
 // MineCore — Safety Alert Types
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { AlertSeverity, AlertStatus } from './enums';
+import { AlertSeverity, AlertStatus } from "./enums";
 
 export interface SafetyAlert {
   id: string;

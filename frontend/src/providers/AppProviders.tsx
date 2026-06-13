@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MineCore — AppProviders
@@ -6,11 +6,11 @@
 // Add new providers here to make them globally available.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import React from 'react';
-import { ThemeProvider } from 'next-themes';
-import { AuthProvider } from '@/contexts/AuthContext';
-import { Toaster } from '@/components/ui/sonner';
-import { TooltipProvider } from '@/components/ui/tooltip';
+import React from "react";
+import { ThemeProvider } from "next-themes";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 interface AppProvidersProps {
   children: React.ReactNode;

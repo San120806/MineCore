@@ -3,14 +3,25 @@
 // Handles authenticated user state, mount verification, and login/logout handlers.
 // ─────────────────────────────────────────────────────────────────────────────
 
-'use client';
+"use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import type { User, LoginPayload } from '@/types/auth';
-import { getTokens, setTokens, clearTokens } from '../services/token.service';
-import { loginApi, getMeApi, logoutApi, refreshTokenApi } from '../services/auth.service';
-import { ROUTES } from '@/constants/routes';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
+import { useRouter } from "next/navigation";
+import type { User, LoginPayload } from "@/types/auth";
+import { getTokens, setTokens, clearTokens } from "../services/token.service";
+import {
+  loginApi,
+  getMeApi,
+  logoutApi,
+  refreshTokenApi,
+} from "../services/auth.service";
+import { ROUTES } from "@/constants/routes";
 
 interface AuthContextType {
   user: User | null;
@@ -54,7 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       // Tokens are invalid or expired, clear them
-      console.error('Failed to restore authentication session:', error);
+      console.error("Failed to restore authentication session:", error);
       clearTokens();
       setUser(null);
       setIsAuthenticated(false);
@@ -91,7 +102,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Call logout endpoint (fire-and-forget/cleanup)
       await logoutApi();
     } catch (error) {
-      console.warn('Backend logout failed or was unreachable:', error);
+      console.warn("Backend logout failed or was unreachable:", error);
     } finally {
       // Always clear local state even if API call fails
       clearTokens();
@@ -117,7 +128,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(profile);
       setIsAuthenticated(true);
     } catch (error) {
-      console.error('Manual token refresh failed:', error);
+      console.error("Manual token refresh failed:", error);
       await logout();
       throw error;
     }
@@ -138,7 +149,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuthContext(): AuthContextType {
   const ctx = useContext(AuthContext);
   if (!ctx) {
-    throw new Error('useAuthContext must be used within an <AuthProvider>');
+    throw new Error("useAuthContext must be used within an <AuthProvider>");
   }
   return ctx;
 }

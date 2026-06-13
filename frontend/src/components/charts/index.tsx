@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MineCore — Chart Components (Recharts)
@@ -21,32 +21,32 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from 'recharts';
+} from "recharts";
 
 // ─── Shared Design Tokens ─────────────────────────────────────────────────────
 
 export const CHART_COLORS = [
-  'var(--color-chart-1)',
-  'var(--color-chart-2)',
-  'var(--color-chart-3)',
-  'var(--color-chart-4)',
-  'var(--color-chart-5)',
+  "var(--color-chart-1)",
+  "var(--color-chart-2)",
+  "var(--color-chart-3)",
+  "var(--color-chart-4)",
+  "var(--color-chart-5)",
 ];
 
 const AXIS_STYLE = {
   fontSize: 11,
-  fill: 'var(--color-muted-foreground)',
-  fontFamily: 'inherit',
+  fill: "var(--color-muted-foreground)",
+  fontFamily: "inherit",
 };
 
-const GRID_COLOR = 'var(--color-border)';
+const GRID_COLOR = "var(--color-border)";
 
 const TOOLTIP_STYLE: React.CSSProperties = {
-  backgroundColor: 'var(--color-popover)',
-  border: '1px solid var(--color-border)',
-  borderRadius: '8px',
-  fontSize: '12px',
-  color: 'var(--color-foreground)',
+  backgroundColor: "var(--color-popover)",
+  border: "1px solid var(--color-border)",
+  borderRadius: "8px",
+  fontSize: "12px",
+  color: "var(--color-foreground)",
 };
 
 // ─── BarChartComponent ────────────────────────────────────────────────────────
@@ -67,7 +67,7 @@ interface BarChartComponentProps {
 export function BarChartComponent({
   data,
   dataKeys,
-  xKey = 'label',
+  xKey = "label",
   colors = CHART_COLORS,
   showGrid = true,
   showLegend = false,
@@ -75,13 +75,33 @@ export function BarChartComponent({
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: -8 }}>
-        {showGrid && <CartesianGrid strokeDasharray="3 3" stroke={GRID_COLOR} vertical={false} />}
-        <XAxis dataKey={xKey} tick={AXIS_STYLE} axisLine={false} tickLine={false} />
+        {showGrid && (
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke={GRID_COLOR}
+            vertical={false}
+          />
+        )}
+        <XAxis
+          dataKey={xKey}
+          tick={AXIS_STYLE}
+          axisLine={false}
+          tickLine={false}
+        />
         <YAxis tick={AXIS_STYLE} axisLine={false} tickLine={false} />
-        <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: 'var(--color-muted)', opacity: 0.3 }} />
+        <Tooltip
+          contentStyle={TOOLTIP_STYLE}
+          cursor={{ fill: "var(--color-muted)", opacity: 0.3 }}
+        />
         {showLegend && <Legend wrapperStyle={{ fontSize: 11 }} />}
         {dataKeys.map((key, idx) => (
-          <Bar key={key} dataKey={key} fill={colors[idx % colors.length]} radius={[3, 3, 0, 0]} maxBarSize={40} />
+          <Bar
+            key={key}
+            dataKey={key}
+            fill={colors[idx % colors.length]}
+            radius={[3, 3, 0, 0]}
+            maxBarSize={40}
+          />
         ))}
       </BarChart>
     </ResponsiveContainer>
@@ -103,7 +123,7 @@ interface LineChartComponentProps {
 export function LineChartComponent({
   data,
   dataKeys,
-  xKey = 'label',
+  xKey = "label",
   colors = CHART_COLORS,
   showGrid = true,
   showLegend = false,
@@ -112,15 +132,26 @@ export function LineChartComponent({
   return (
     <ResponsiveContainer width="100%" height="100%">
       <LineChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: -8 }}>
-        {showGrid && <CartesianGrid strokeDasharray="3 3" stroke={GRID_COLOR} vertical={false} />}
-        <XAxis dataKey={xKey} tick={AXIS_STYLE} axisLine={false} tickLine={false} />
+        {showGrid && (
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke={GRID_COLOR}
+            vertical={false}
+          />
+        )}
+        <XAxis
+          dataKey={xKey}
+          tick={AXIS_STYLE}
+          axisLine={false}
+          tickLine={false}
+        />
         <YAxis tick={AXIS_STYLE} axisLine={false} tickLine={false} />
         <Tooltip contentStyle={TOOLTIP_STYLE} />
         {showLegend && <Legend wrapperStyle={{ fontSize: 11 }} />}
         {dataKeys.map((key, idx) => (
           <Line
             key={key}
-            type={curved ? 'monotone' : 'linear'}
+            type={curved ? "monotone" : "linear"}
             dataKey={key}
             stroke={colors[idx % colors.length]}
             strokeWidth={2}
@@ -173,7 +204,9 @@ export function PieChartComponent({
           ))}
         </Pie>
         <Tooltip contentStyle={TOOLTIP_STYLE} />
-        {showLegend && <Legend wrapperStyle={{ fontSize: 11 }} iconType="circle" />}
+        {showLegend && (
+          <Legend wrapperStyle={{ fontSize: 11 }} iconType="circle" />
+        )}
       </PieChart>
     </ResponsiveContainer>
   );
@@ -193,7 +226,7 @@ interface AreaChartComponentProps {
 export function AreaChartComponent({
   data,
   dataKeys,
-  xKey = 'label',
+  xKey = "label",
   colors = CHART_COLORS,
   showGrid = true,
   showLegend = false,
@@ -203,14 +236,40 @@ export function AreaChartComponent({
       <AreaChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: -8 }}>
         <defs>
           {dataKeys.map((key, idx) => (
-            <linearGradient key={key} id={`gradient-${key}`} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={colors[idx % colors.length]} stopOpacity={0.25} />
-              <stop offset="95%" stopColor={colors[idx % colors.length]} stopOpacity={0} />
+            <linearGradient
+              key={key}
+              id={`gradient-${key}`}
+              x1="0"
+              y1="0"
+              x2="0"
+              y2="1"
+            >
+              <stop
+                offset="5%"
+                stopColor={colors[idx % colors.length]}
+                stopOpacity={0.25}
+              />
+              <stop
+                offset="95%"
+                stopColor={colors[idx % colors.length]}
+                stopOpacity={0}
+              />
             </linearGradient>
           ))}
         </defs>
-        {showGrid && <CartesianGrid strokeDasharray="3 3" stroke={GRID_COLOR} vertical={false} />}
-        <XAxis dataKey={xKey} tick={AXIS_STYLE} axisLine={false} tickLine={false} />
+        {showGrid && (
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke={GRID_COLOR}
+            vertical={false}
+          />
+        )}
+        <XAxis
+          dataKey={xKey}
+          tick={AXIS_STYLE}
+          axisLine={false}
+          tickLine={false}
+        />
         <YAxis tick={AXIS_STYLE} axisLine={false} tickLine={false} />
         <Tooltip contentStyle={TOOLTIP_STYLE} />
         {showLegend && <Legend wrapperStyle={{ fontSize: 11 }} />}

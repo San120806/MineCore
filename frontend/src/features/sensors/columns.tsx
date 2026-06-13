@@ -2,32 +2,34 @@
 // MineCore — Sensors Table Column Definitions
 // ─────────────────────────────────────────────────────────────────────────────
 
-import type { ColumnDef } from '@tanstack/react-table';
-import type { Sensor } from '@/types/sensor';
-import { StatusBadge } from '@/components/shared/StatusBadge';
-import { SENSOR_TYPE_LABELS } from '@/constants/enums';
-import { formatRelativeTime } from '@/lib/utils';
+import type { ColumnDef } from "@tanstack/react-table";
+import type { Sensor } from "@/types/sensor";
+import { StatusBadge } from "@/components/shared/StatusBadge";
+import { SENSOR_TYPE_LABELS } from "@/constants/enums";
+import { formatRelativeTime } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Edit, Trash } from 'lucide-react';
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { MoreHorizontal, Edit, Trash } from "lucide-react";
 
 export const sensorColumns: ColumnDef<Sensor, unknown>[] = [
   {
-    accessorKey: 'sensorCode',
-    header: 'Code',
+    accessorKey: "sensorCode",
+    header: "Code",
     cell: ({ getValue }) => (
-      <span className="font-mono text-xs text-muted-foreground">{String(getValue())}</span>
+      <span className="font-mono text-xs text-muted-foreground">
+        {String(getValue())}
+      </span>
     ),
     enableSorting: true,
   },
   {
-    accessorKey: 'name',
-    header: 'Sensor',
+    accessorKey: "name",
+    header: "Sensor",
     cell: ({ row }) => (
       <div>
         <p className="font-medium text-sm">{row.original.name}</p>
@@ -39,20 +41,21 @@ export const sensorColumns: ColumnDef<Sensor, unknown>[] = [
     enableSorting: true,
   },
   {
-    accessorKey: 'status',
-    header: 'Status',
+    accessorKey: "status",
+    header: "Status",
     cell: ({ getValue }) => <StatusBadge value={String(getValue())} />,
     enableSorting: true,
   },
   {
-    accessorKey: 'value',
-    header: 'Current Reading',
+    accessorKey: "value",
+    header: "Current Reading",
     cell: ({ row }) => {
       const val = row.original.value;
       const unit = row.original.unit;
       return val != null ? (
         <span className="font-mono text-sm tabular-nums">
-          {val.toFixed(2)} <span className="text-muted-foreground text-xs">{unit}</span>
+          {val.toFixed(2)}{" "}
+          <span className="text-muted-foreground text-xs">{unit}</span>
         </span>
       ) : (
         <span className="text-muted-foreground">—</span>
@@ -61,16 +64,18 @@ export const sensorColumns: ColumnDef<Sensor, unknown>[] = [
     enableSorting: false,
   },
   {
-    accessorKey: 'site',
-    header: 'Site',
+    accessorKey: "site",
+    header: "Site",
     cell: ({ row }) => (
-      <span className="text-sm text-muted-foreground">{row.original.site?.name ?? '—'}</span>
+      <span className="text-sm text-muted-foreground">
+        {row.original.site?.name ?? "—"}
+      </span>
     ),
     enableSorting: false,
   },
   {
-    accessorKey: 'lastReading',
-    header: 'Last Reading',
+    accessorKey: "lastReading",
+    header: "Last Reading",
     cell: ({ getValue }) => (
       <span className="text-xs text-muted-foreground">
         {formatRelativeTime(getValue() as string | null | undefined)}
@@ -79,8 +84,8 @@ export const sensorColumns: ColumnDef<Sensor, unknown>[] = [
     enableSorting: true,
   },
   {
-    id: 'actions',
-    header: '',
+    id: "actions",
+    header: "",
     cell: ({ row, table }) => {
       const sensor = row.original;
       const meta = table.options.meta as any;

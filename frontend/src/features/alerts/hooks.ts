@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
-import { getAlerts } from '@/services/alerts.service';
-import type { SafetyAlert, AlertQueryParams } from '@/types/alert';
-import { useDebounce } from '@/hooks/useDebounce';
-import { AlertSeverity, AlertStatus } from '@/types/enums';
+import { useState, useEffect, useCallback } from "react";
+import { getAlerts } from "@/services/alerts.service";
+import type { SafetyAlert, AlertQueryParams } from "@/types/alert";
+import { useDebounce } from "@/hooks/useDebounce";
+import { AlertSeverity, AlertStatus } from "@/types/enums";
 
 export function useAlerts() {
   const [data, setData] = useState<SafetyAlert[]>([]);
@@ -11,8 +11,10 @@ export function useAlerts() {
   const [error, setError] = useState<string | null>(null);
 
   // Filter and pagination state
-  const [search, setSearch] = useState<string>('');
-  const [severity, setSeverity] = useState<AlertSeverity | undefined>(undefined);
+  const [search, setSearch] = useState<string>("");
+  const [severity, setSeverity] = useState<AlertSeverity | undefined>(
+    undefined,
+  );
   const [status, setStatus] = useState<AlertStatus | undefined>(undefined);
   const [siteId, setSiteId] = useState<string | undefined>(undefined);
   const [page, setPage] = useState<number>(1);
@@ -36,8 +38,10 @@ export function useAlerts() {
       setData(response.data);
       setTotalCount(response.meta.total);
     } catch (err: any) {
-      console.error('Error fetching alerts:', err);
-      setError(err.response?.data?.message || err.message || 'Failed to load alerts');
+      console.error("Error fetching alerts:", err);
+      setError(
+        err.response?.data?.message || err.message || "Failed to load alerts",
+      );
     } finally {
       setIsLoading(false);
     }

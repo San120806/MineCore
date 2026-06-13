@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import type { Metadata } from 'next';
-import { PageHeader } from '@/components/layout/PageHeader';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { useTheme } from 'next-themes';
-import { Sun, Moon } from 'lucide-react';
+import type { Metadata } from "next";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { useTheme } from "next-themes";
+import { Sun, Moon } from "lucide-react";
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
@@ -42,22 +42,22 @@ export default function SettingsPage() {
         <Separator />
         <div className="flex items-center gap-3">
           <button
-            onClick={() => setTheme('light')}
+            onClick={() => setTheme("light")}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm transition-colors ${
-              theme === 'light'
-                ? 'border-primary bg-primary/10 text-primary'
-                : 'border-border text-muted-foreground hover:border-border/80'
+              theme === "light"
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-border text-muted-foreground hover:border-border/80"
             }`}
           >
             <Sun className="w-4 h-4" />
             Light
           </button>
           <button
-            onClick={() => setTheme('dark')}
+            onClick={() => setTheme("dark")}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm transition-colors ${
-              theme === 'dark'
-                ? 'border-primary bg-primary/10 text-primary'
-                : 'border-border text-muted-foreground hover:border-border/80'
+              theme === "dark"
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-border text-muted-foreground hover:border-border/80"
             }`}
           >
             <Moon className="w-4 h-4" />
@@ -70,7 +70,8 @@ export default function SettingsPage() {
       <section className="rounded-lg border border-destructive/20 bg-destructive/5 p-5 space-y-3">
         <h3 className="text-sm font-semibold text-foreground">Danger Zone</h3>
         <p className="text-xs text-muted-foreground">
-          Sign out of MineCore. You will need to sign in again to access the platform.
+          Sign out of MineCore. You will need to sign in again to access the
+          platform.
         </p>
         <Button variant="destructive" size="sm" id="signout-btn">
           Sign Out

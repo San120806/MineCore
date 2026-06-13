@@ -3,13 +3,13 @@
 // Redirects unauthenticated users to the login page.
 // ─────────────────────────────────────────────────────────────────────────────
 
-'use client';
+"use client";
 
-import React, { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '../hooks/useAuth';
-import { ContentSkeleton } from '@/components/shared/LoadingSkeleton';
-import { ROUTES } from '@/constants/routes';
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../hooks/useAuth";
+import { ContentSkeleton } from "@/components/shared/LoadingSkeleton";
+import { ROUTES } from "@/constants/routes";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;

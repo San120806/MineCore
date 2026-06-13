@@ -2,8 +2,8 @@
 // MineCore — EmptyState Component
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { type LucideIcon, Inbox } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { type LucideIcon, Inbox } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface EmptyStateProps {
   icon?: LucideIcon;
@@ -23,7 +23,7 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center py-16 px-6 text-center',
+        "flex flex-col items-center justify-center py-16 px-6 text-center",
         className,
       )}
     >

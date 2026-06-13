@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
-import { getVehicles } from '@/services/vehicles.service';
-import type { Vehicle, VehicleQueryParams } from '@/types/vehicle';
-import { useDebounce } from '@/hooks/useDebounce';
-import { VehicleStatus, VehicleType } from '@/types/enums';
+import { useState, useEffect, useCallback } from "react";
+import { getVehicles } from "@/services/vehicles.service";
+import type { Vehicle, VehicleQueryParams } from "@/types/vehicle";
+import { useDebounce } from "@/hooks/useDebounce";
+import { VehicleStatus, VehicleType } from "@/types/enums";
 
 export function useVehicles() {
   const [data, setData] = useState<Vehicle[]>([]);
@@ -11,7 +11,7 @@ export function useVehicles() {
   const [error, setError] = useState<string | null>(null);
 
   // Filter and pagination state
-  const [search, setSearch] = useState<string>('');
+  const [search, setSearch] = useState<string>("");
   const [status, setStatus] = useState<VehicleStatus | undefined>(undefined);
   const [type, setType] = useState<VehicleType | undefined>(undefined);
   const [siteId, setSiteId] = useState<string | undefined>(undefined);
@@ -36,8 +36,10 @@ export function useVehicles() {
       setData(response.data);
       setTotalCount(response.meta.total);
     } catch (err: any) {
-      console.error('Error fetching vehicles:', err);
-      setError(err.response?.data?.message || err.message || 'Failed to load vehicles');
+      console.error("Error fetching vehicles:", err);
+      setError(
+        err.response?.data?.message || err.message || "Failed to load vehicles",
+      );
     } finally {
       setIsLoading(false);
     }

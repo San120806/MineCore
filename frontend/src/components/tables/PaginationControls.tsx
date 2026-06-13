@@ -2,9 +2,9 @@
 // MineCore — PaginationControls Component
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface PaginationControlsProps {
   page: number;
@@ -28,10 +28,19 @@ export function PaginationControls({
   if (totalPages <= 1) return null;
 
   return (
-    <div className={cn('flex items-center justify-between text-sm text-muted-foreground', className)}>
+    <div
+      className={cn(
+        "flex items-center justify-between text-sm text-muted-foreground",
+        className,
+      )}
+    >
       <p>
-        Showing <span className="font-medium text-foreground">{from}–{to}</span> of{' '}
-        <span className="font-medium text-foreground">{totalCount}</span> records
+        Showing{" "}
+        <span className="font-medium text-foreground">
+          {from}–{to}
+        </span>{" "}
+        of <span className="font-medium text-foreground">{totalCount}</span>{" "}
+        records
       </p>
 
       <div className="flex items-center gap-1">
@@ -61,12 +70,12 @@ export function PaginationControls({
           return (
             <Button
               key={pageNum}
-              variant={pageNum === page ? 'default' : 'outline'}
+              variant={pageNum === page ? "default" : "outline"}
               size="icon"
               className="h-8 w-8 text-xs"
               onClick={() => onPageChange(pageNum)}
               aria-label={`Page ${pageNum}`}
-              aria-current={pageNum === page ? 'page' : undefined}
+              aria-current={pageNum === page ? "page" : undefined}
             >
               {pageNum}
             </Button>

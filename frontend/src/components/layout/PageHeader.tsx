@@ -3,7 +3,7 @@
 // Reusable page header with title, subtitle, and optional action slot
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
 
 interface PageHeaderProps {
   title: string;
@@ -13,9 +13,16 @@ interface PageHeaderProps {
   className?: string;
 }
 
-export function PageHeader({ title, subtitle, actions, className }: PageHeaderProps) {
+export function PageHeader({
+  title,
+  subtitle,
+  actions,
+  className,
+}: PageHeaderProps) {
   return (
-    <div className={cn('flex items-start justify-between gap-4 mb-6', className)}>
+    <div
+      className={cn("flex items-start justify-between gap-4 mb-6", className)}
+    >
       <div className="min-w-0">
         <h2 className="text-xl font-semibold text-foreground tracking-tight truncate">
           {title}

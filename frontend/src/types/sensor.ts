@@ -2,7 +2,7 @@
 // MineCore — Sensor Types
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { SensorType, SensorStatus } from './enums';
+import { SensorType, SensorStatus } from "./enums";
 
 export interface Sensor {
   id: string;

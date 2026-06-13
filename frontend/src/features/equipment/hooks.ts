@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
-import { getEquipmentList } from '@/services/equipment.service';
-import type { Equipment, EquipmentQueryParams } from '@/types/equipment';
-import { useDebounce } from '@/hooks/useDebounce';
-import { EquipmentStatus, EquipmentType } from '@/types/enums';
+import { useState, useEffect, useCallback } from "react";
+import { getEquipmentList } from "@/services/equipment.service";
+import type { Equipment, EquipmentQueryParams } from "@/types/equipment";
+import { useDebounce } from "@/hooks/useDebounce";
+import { EquipmentStatus, EquipmentType } from "@/types/enums";
 
 export function useEquipment() {
   const [data, setData] = useState<Equipment[]>([]);
@@ -11,7 +11,7 @@ export function useEquipment() {
   const [error, setError] = useState<string | null>(null);
 
   // Filter and pagination state
-  const [search, setSearch] = useState<string>('');
+  const [search, setSearch] = useState<string>("");
   const [status, setStatus] = useState<EquipmentStatus | undefined>(undefined);
   const [type, setType] = useState<EquipmentType | undefined>(undefined);
   const [siteId, setSiteId] = useState<string | undefined>(undefined);
@@ -36,8 +36,12 @@ export function useEquipment() {
       setData(response.data);
       setTotalCount(response.meta.total);
     } catch (err: any) {
-      console.error('Error fetching equipment:', err);
-      setError(err.response?.data?.message || err.message || 'Failed to load equipment');
+      console.error("Error fetching equipment:", err);
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Failed to load equipment",
+      );
     } finally {
       setIsLoading(false);
     }
