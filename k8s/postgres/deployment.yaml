@@ -1,0 +1,12 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# MineCore — PostgreSQL StatefulSet
+# File: k8s/postgres/deployment.yaml
+# Purpose: Runs postgres:15-alpine as a StatefulSet (1 replica)
+#          Mounts PVC at /var/lib/postgresql/data
+#          Injects credentials from app-secret (POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB)
+#          Resource limits: 250m–1000m CPU, 512Mi–1Gi Memory
+# Apply Order: #6 — After storage (pv+pvc) and secrets are ready
+# Image: postgres:15-alpine
+# Port: 5432
+# ─────────────────────────────────────────────────────────────────────────────
+# CONTENT: To be added in Objective 3.3

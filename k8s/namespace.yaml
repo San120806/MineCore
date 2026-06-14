@@ -1,0 +1,14 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# MineCore — Kubernetes Namespace
+# Objective 3.3: Configuration Management
+# ─────────────────────────────────────────────────────────────────────────────
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: minecore
+  labels:
+    app.kubernetes.io/name: minecore
+    app.kubernetes.io/instance: minecore
+    app.kubernetes.io/part-of: minecore
+    app.kubernetes.io/managed-by: kubectl
+    environment: development

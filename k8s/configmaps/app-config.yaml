@@ -1,0 +1,65 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# MineCore — Kubernetes ConfigMaps (Non-Sensitive Configuration)
+# Objective 3.3: Configuration Management
+#
+# Contains TWO ConfigMaps separated by ---:
+#   1. minecore-backend-config  → consumed by backend/deployment.yaml
+#   2. minecore-frontend-config → consumed by frontend/deployment.yaml
+#
+# Rule: Only non-sensitive values live here. Credentials go in app-secret.yaml.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── 1. Backend ConfigMap ──────────────────────────────────────────────────────
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: minecore-backend-config
+  namespace: minecore
+  labels:
+    app.kubernetes.io/name: backend
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: minecore
+    app.kubernetes.io/managed-by: kubectl
+    environment: development
+data:
+  # Server
+  NODE_ENV: "production"
+  PORT: "4000"
+  API_VERSION: "v1"
+
+  # CORS — allow frontend NodePort (30000) and Ingress port 80
+  # Update CORS_ORIGIN when switching to a real domain or Ingress
+  CORS_ORIGIN: "http://localhost:30000"
+
+  # Rate Limiting
+  RATE_LIMIT_WINDOW_MS: "900000"   # 15 minutes in milliseconds
+  RATE_LIMIT_MAX: "100"            # max requests per window per IP
+
+  # JWT Expiry (values only — secrets are in app-secret.yaml)
+  JWT_ACCESS_EXPIRES_IN: "24h"
+  JWT_REFRESH_EXPIRES_IN: "7d"
+
+---
+
+# ── 2. Frontend ConfigMap ─────────────────────────────────────────────────────
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: minecore-frontend-config
+  namespace: minecore
+  labels:
+    app.kubernetes.io/name: frontend
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/part-of: minecore
+    app.kubernetes.io/managed-by: kubectl
+    environment: development
+data:
+  # Next.js server binding
+  PORT: "3000"
+  HOSTNAME: "0.0.0.0"
+  NODE_ENV: "production"
+
+  # Internal K8s DNS — frontend pod reaches backend via ClusterIP service
+  # Format: http://<service-name>.<namespace>.svc.cluster.local:<port>
+  # Short form works within the same namespace:
+  NEXT_PUBLIC_API_URL: "http://minecore-backend-svc:4000"

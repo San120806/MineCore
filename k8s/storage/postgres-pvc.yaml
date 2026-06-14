@@ -1,0 +1,10 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# MineCore — Persistent Volume Claim
+# File: k8s/storage/postgres-pvc.yaml
+# Purpose: Claims 5Gi from the PersistentVolume declared in postgres-pv.yaml
+#          Binds to 'minecore-postgres-pv' by name
+#          Mounted into the postgres pod at /var/lib/postgresql/data
+# Apply Order: #5 — After postgres-pv.yaml; before postgres/deployment.yaml
+# Namespace: minecore
+# ─────────────────────────────────────────────────────────────────────────────
+# CONTENT: To be added in Objective 3.3

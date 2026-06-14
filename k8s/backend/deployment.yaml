@@ -1,0 +1,15 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# MineCore — Backend Deployment
+# File: k8s/backend/deployment.yaml
+# Purpose: Runs the Express.js API as a Deployment (1 replica)
+#          Injects secrets (DATABASE_URL, JWT_*) from app-secret
+#          Injects config (NODE_ENV, PORT, CORS_ORIGIN, etc.) from app-config
+#          Runs: npx prisma migrate deploy && node dist/server.js
+#          Resource limits: 100m–500m CPU, 256Mi–512Mi Memory
+#          Liveness probe: GET /api/v1/health → 200
+#          Readiness probe: GET /api/v1/health → 200
+# Apply Order: #8 — After postgres service is running and secrets/configmaps exist
+# Image: minecore-backend:latest (loaded into kind via 'kind load docker-image')
+# Port: 4000
+# ─────────────────────────────────────────────────────────────────────────────
+# CONTENT: To be added in Objective 3.3

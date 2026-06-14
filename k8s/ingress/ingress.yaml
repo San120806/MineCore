@@ -1,0 +1,13 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# MineCore — Ingress
+# File: k8s/ingress/ingress.yaml
+# Purpose: Routes external HTTP traffic to the correct internal service
+#          Uses nginx IngressController (installed separately on kind)
+#          Rules:
+#            /api/*  → minecore-backend-svc:4000   (strips /api prefix)
+#            /*      → minecore-frontend-svc:3000
+#          Host: localhost (dev) or minecore.local
+# Apply Order: #12 — Last. Requires nginx IngressController to be installed first
+# Prerequisite: kubectl apply -f https://...ingress-nginx.../deploy.yaml
+# ─────────────────────────────────────────────────────────────────────────────
+# CONTENT: To be added in Objective 3.3

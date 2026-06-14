@@ -1,0 +1,12 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# MineCore — Frontend Service
+# File: k8s/frontend/service.yaml
+# Purpose: Exposes frontend pod to the browser via NodePort
+#          NodePort 30000 → container port 3000
+#          Access in browser: http://localhost:30000
+#          Also routed by Ingress at path /
+# Apply Order: #11 — After frontend/deployment.yaml
+# Port: 3000 (container) → 30000 (node)
+# Type: NodePort
+# ─────────────────────────────────────────────────────────────────────────────
+# CONTENT: To be added in Objective 3.3

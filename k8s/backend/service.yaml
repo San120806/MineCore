@@ -1,0 +1,13 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# MineCore — Backend Service
+# File: k8s/backend/service.yaml
+# Purpose: Exposes backend pod as ClusterIP inside the cluster
+#          DNS: minecore-backend-svc.minecore.svc.cluster.local
+#          Frontend calls backend via: http://minecore-backend-svc:4000
+#          Also routed by Ingress at path /api/*
+#          NEVER directly exposed outside cluster (ClusterIP type)
+# Apply Order: #9 — After backend/deployment.yaml
+# Port: 4000
+# Type: ClusterIP
+# ─────────────────────────────────────────────────────────────────────────────
+# CONTENT: To be added in Objective 3.3

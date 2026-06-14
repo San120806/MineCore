@@ -1,0 +1,13 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# MineCore — Frontend Deployment
+# File: k8s/frontend/deployment.yaml
+# Purpose: Runs Next.js standalone server as a Deployment (1 replica)
+#          Injects config (NEXT_PUBLIC_API_URL, PORT, HOSTNAME) from app-config
+#          Resource limits: 100m–500m CPU, 256Mi–512Mi Memory
+#          Liveness probe:  GET / → 200
+#          Readiness probe: GET / → 200
+# Apply Order: #10 — After backend service is running and configmaps exist
+# Image: minecore-frontend:latest (loaded into kind via 'kind load docker-image')
+# Port: 3000
+# ─────────────────────────────────────────────────────────────────────────────
+# CONTENT: To be added in Objective 3.3

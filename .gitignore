@@ -36,3 +36,6 @@ pnpm-debug.log*
 # Database & Docker Persistence
 /postgres_data/
 docker-compose.override.yml
+
+# Kubernetes Secrets — NEVER commit real credentials
+k8s/secrets/app-secret.yaml

@@ -1,0 +1,12 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# MineCore — PostgreSQL Service
+# File: k8s/postgres/service.yaml
+# Purpose: Exposes PostgreSQL pod as a ClusterIP service inside the cluster
+#          DNS: minecore-postgres-svc.minecore.svc.cluster.local
+#          Backend connects via: postgres://...@minecore-postgres-svc:5432/...
+#          NEVER exposed outside the cluster (ClusterIP type)
+# Apply Order: #7 — After postgres/deployment.yaml
+# Port: 5432
+# Type: ClusterIP
+# ─────────────────────────────────────────────────────────────────────────────
+# CONTENT: To be added in Objective 3.3

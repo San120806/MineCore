@@ -1,0 +1,11 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# MineCore — Persistent Volume
+# File: k8s/storage/postgres-pv.yaml
+# Purpose: Declares a 5Gi PersistentVolume backed by kind's hostPath
+#          Maps to /mnt/data/minecore-postgres on the kind node
+#          Ensures PostgreSQL data survives pod restarts and rollouts
+# Apply Order: #4 — Must exist before postgres-pvc.yaml can bind
+# StorageClass: standard (kind default)
+# Access Mode: ReadWriteOnce
+# ─────────────────────────────────────────────────────────────────────────────
+# CONTENT: To be added in Objective 3.3
