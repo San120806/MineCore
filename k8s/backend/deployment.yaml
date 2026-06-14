@@ -1,15 +1,115 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # MineCore — Backend Deployment
 # File: k8s/backend/deployment.yaml
-# Purpose: Runs the Express.js API as a Deployment (1 replica)
-#          Injects secrets (DATABASE_URL, JWT_*) from app-secret
-#          Injects config (NODE_ENV, PORT, CORS_ORIGIN, etc.) from app-config
-#          Runs: npx prisma migrate deploy && node dist/server.js
-#          Resource limits: 100m–500m CPU, 256Mi–512Mi Memory
-#          Liveness probe: GET /api/v1/health → 200
-#          Readiness probe: GET /api/v1/health → 200
-# Apply Order: #8 — After postgres service is running and secrets/configmaps exist
-# Image: minecore-backend:latest (loaded into kind via 'kind load docker-image')
-# Port: 4000
+# Objective 3.6: Backend Deployment
+#
+# Key design decisions:
+#   - Replicas: 2 (for high availability and load balancing)
+#   - Strategy: RollingUpdate (maxSurge: 1, maxUnavailable: 0)
+#     → Ensures zero-downtime deployments. New pods must pass readiness
+#       probes before old pods are terminated.
+#   - Command: ["sh", "-c", "npx prisma migrate deploy && node dist/server.js"]
+#     → Automatically runs Prisma migrations on pod startup.
+#     → Because Prisma migrations are idempotent, this is safe to run from
+#       multiple pods concurrently (Prisma uses a database lock table).
+#   - Configuration:
+#     - envFrom ConfigMap: minecore-backend-config
+#     - envFrom Secret: minecore-app-secret
+#   - Resource Limits:
+#     - Requests: 100m CPU, 256Mi Memory (guaranteed minimum)
+#     - Limits: 500m CPU, 512Mi Memory (throttling boundary)
+#   - Probes:
+#     - Liveness: GET /health (checks if app is running; restarts if failed)
+#     - Readiness: GET /health (checks if app is ready to serve traffic)
+#
+# Depends on:
+#   - namespace:  minecore (namespace.yaml)
+#   - configmap:  minecore-backend-config (configmaps/app-config.yaml)
+#   - secret:     minecore-app-secret (secrets/app-secret.yaml)
+#   - service:    minecore-postgres-svc (postgres/service.yaml - database must be up)
+#
+# Apply Order: #8 — After postgres service is active and healthy
 # ─────────────────────────────────────────────────────────────────────────────
-# CONTENT: To be added in Objective 3.3
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minecore-backend
+  namespace: minecore
+  labels:
+    app.kubernetes.io/name: backend
+    app.kubernetes.io/instance: minecore
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: minecore
+    app.kubernetes.io/managed-by: kubectl
+    environment: development
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: backend
+      app.kubernetes.io/part-of: minecore
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: backend
+        app.kubernetes.io/instance: minecore
+        app.kubernetes.io/component: backend
+        app.kubernetes.io/part-of: minecore
+        environment: development
+    spec:
+      containers:
+        - name: backend
+          image: minecore-backend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 4000
+              protocol: TCP
+          
+          # Command override to run migrations first
+          command:
+            - sh
+            - -c
+            - "npx prisma migrate deploy && node dist/server.js"
+          
+          # Injects configuration and secrets
+          envFrom:
+            - configMapRef:
+                name: minecore-backend-config
+            - secretRef:
+                name: minecore-app-secret
+          
+          # Resource constraints
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          
+          # Liveness Probe (Restarts container if app freezes)
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 4000
+            initialDelaySeconds: 30  # Give Prisma migrations time to run
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 5
+          
+          # Readiness Probe (Adds container to service pool when ready)
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 4000
+            initialDelaySeconds: 15  # Start checking early
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3

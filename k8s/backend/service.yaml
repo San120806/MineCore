@@ -1,13 +1,40 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# MineCore — Backend Service
+# MineCore — Backend ClusterIP Service
 # File: k8s/backend/service.yaml
-# Purpose: Exposes backend pod as ClusterIP inside the cluster
-#          DNS: minecore-backend-svc.minecore.svc.cluster.local
-#          Frontend calls backend via: http://minecore-backend-svc:4000
-#          Also routed by Ingress at path /api/*
-#          NEVER directly exposed outside cluster (ClusterIP type)
+# Objective 3.6: Backend Deployment
+#
+# Service type: ClusterIP
+#   → Internal-only. The backend service is not exposed directly outside the
+#     cluster; ingress routing (or local port forwarding) will access it.
+#   → DNS: minecore-backend-svc.minecore.svc.cluster.local
+#   → Frontend pods reach backend at: http://minecore-backend-svc:4000
+#
+# CRITICAL: The service name 'minecore-backend-svc' must match the hostname
+# used in the frontend NEXT_PUBLIC_API_URL ConfigMap:
+#   NEXT_PUBLIC_API_URL: "http://minecore-backend-svc:4000"
+#
 # Apply Order: #9 — After backend/deployment.yaml
-# Port: 4000
-# Type: ClusterIP
 # ─────────────────────────────────────────────────────────────────────────────
-# CONTENT: To be added in Objective 3.3
+apiVersion: v1
+kind: Service
+metadata:
+  name: minecore-backend-svc
+  namespace: minecore
+  labels:
+    app.kubernetes.io/name: backend
+    app.kubernetes.io/instance: minecore
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: minecore
+    app.kubernetes.io/managed-by: kubectl
+    environment: development
+spec:
+  type: ClusterIP
+  selector:
+    # Routes traffic to pods with these labels (set in backend Deployment)
+    app.kubernetes.io/name: backend
+    app.kubernetes.io/part-of: minecore
+  ports:
+    - name: http
+      protocol: TCP
+      port: 4000         # Port the service listens on inside the cluster
+      targetPort: 4000   # Port the backend container runs on
