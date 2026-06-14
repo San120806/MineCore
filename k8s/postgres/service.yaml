@@ -1,12 +1,38 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# MineCore — PostgreSQL Service
-# File: k8s/postgres/service.yaml
-# Purpose: Exposes PostgreSQL pod as a ClusterIP service inside the cluster
-#          DNS: minecore-postgres-svc.minecore.svc.cluster.local
-#          Backend connects via: postgres://...@minecore-postgres-svc:5432/...
-#          NEVER exposed outside the cluster (ClusterIP type)
-# Apply Order: #7 — After postgres/deployment.yaml
-# Port: 5432
-# Type: ClusterIP
+# MineCore — PostgreSQL ClusterIP Service
+# Objective 3.5: PostgreSQL Deployment
+#
+# Service type: ClusterIP
+#   → Internal-only. PostgreSQL is NEVER exposed outside the cluster.
+#   → Backend pods reach postgres at: minecore-postgres-svc:5432
+#   → Full DNS: minecore-postgres-svc.minecore.svc.cluster.local:5432
+#
+# CRITICAL: The service name 'minecore-postgres-svc' MUST match the hostname
+# used in the DATABASE_URL secret:
+#   postgresql://...@minecore-postgres-svc:5432/minecore_db
+#
+# Apply Order: #7 — After postgres/deployment.yaml (StatefulSet)
 # ─────────────────────────────────────────────────────────────────────────────
-# CONTENT: To be added in Objective 3.3
+apiVersion: v1
+kind: Service
+metadata:
+  name: minecore-postgres-svc
+  namespace: minecore
+  labels:
+    app.kubernetes.io/name: postgres
+    app.kubernetes.io/instance: minecore
+    app.kubernetes.io/component: database
+    app.kubernetes.io/part-of: minecore
+    app.kubernetes.io/managed-by: kubectl
+    environment: development
+spec:
+  type: ClusterIP      # Internal only — postgres never exposed externally
+  selector:
+    # Routes traffic to pods with this label (set in StatefulSet pod template)
+    app.kubernetes.io/name: postgres
+    app.kubernetes.io/part-of: minecore
+  ports:
+    - name: postgres
+      protocol: TCP
+      port: 5432         # Port the service listens on (what backend connects to)
+      targetPort: 5432   # Port on the postgres container
