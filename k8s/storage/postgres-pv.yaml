@@ -1,11 +1,21 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# MineCore — Persistent Volume
-# File: k8s/storage/postgres-pv.yaml
-# Purpose: Declares a 5Gi PersistentVolume backed by kind's hostPath
-#          Maps to /mnt/data/minecore-postgres on the kind node
-#          Ensures PostgreSQL data survives pod restarts and rollouts
-# Apply Order: #4 — Must exist before postgres-pvc.yaml can bind
-# StorageClass: standard (kind default)
-# Access Mode: ReadWriteOnce
+# MineCore — PersistentVolume (NOT USED — Dynamic Provisioning Active)
+# Objective 3.4: Persistent Storage
+#
+# ✅ DECISION: Dynamic provisioning is used for this cluster.
+#
+# The 'standard' StorageClass (rancher.io/local-path) automatically creates
+# a PersistentVolume when the postgres pod is first scheduled.
+# A manual PV definition is therefore NOT required.
+#
+# This file is kept as a reference/documentation artifact only.
+# DO NOT APPLY this file.
+#
+# When would you need a manual PV?
+#   - When using a StorageClass with no dynamic provisioner
+#   - When you need a specific host path or NFS share
+#   - When migrating existing data to a new cluster
+#
+# For MineCore on kind: dynamic provisioning handles everything automatically.
 # ─────────────────────────────────────────────────────────────────────────────
-# CONTENT: To be added in Objective 3.3
+# NO YAML — Manual PV not needed. See postgres-pvc.yaml.

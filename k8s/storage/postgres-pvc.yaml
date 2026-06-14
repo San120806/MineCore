@@ -1,10 +1,38 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# MineCore — Persistent Volume Claim
-# File: k8s/storage/postgres-pvc.yaml
-# Purpose: Claims 5Gi from the PersistentVolume declared in postgres-pv.yaml
-#          Binds to 'minecore-postgres-pv' by name
-#          Mounted into the postgres pod at /var/lib/postgresql/data
-# Apply Order: #5 — After postgres-pv.yaml; before postgres/deployment.yaml
-# Namespace: minecore
+# MineCore — PersistentVolumeClaim for PostgreSQL
+# Objective 3.4: Persistent Storage
+#
+# Strategy: DYNAMIC PROVISIONING
+#   - No manual PersistentVolume (PV) is created.
+#   - The 'standard' StorageClass automatically provisions a PV on demand
+#     when the first pod that needs this PVC is scheduled.
+#   - Provisioner: rancher.io/local-path (kind default)
+#   - VolumeBindingMode: WaitForFirstConsumer
+#     → The PV is not created until the postgres pod is scheduled to a node.
+#     → This is the correct behavior for single-node kind clusters.
+#
+# Consumed by: postgres/deployment.yaml (StatefulSet)
+# Mount path:  /var/lib/postgresql/data (inside postgres container)
+# Apply Order: #4 — After namespace and secrets; before postgres/deployment.yaml
 # ─────────────────────────────────────────────────────────────────────────────
-# CONTENT: To be added in Objective 3.3
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minecore-postgres-pvc
+  namespace: minecore
+  labels:
+    app.kubernetes.io/name: postgres
+    app.kubernetes.io/component: database
+    app.kubernetes.io/part-of: minecore
+    app.kubernetes.io/managed-by: kubectl
+    environment: development
+  annotations:
+    # Documents what this storage is for — visible in kubectl describe
+    description: "PostgreSQL data volume for MineCore mining operations platform"
+spec:
+  accessModes:
+    - ReadWriteOnce      # Only one node mounts this at a time (correct for single DB)
+  storageClassName: standard  # kind default — rancher.io/local-path provisioner
+  resources:
+    requests:
+      storage: 2Gi       # 2Gi — appropriate for academic/dev PostgreSQL workload
