@@ -14,6 +14,8 @@ spec:
     repoURL: 'https://github.com/San120806/MineCore.git'
     targetRevision: main
     path: k8s
+    directory:
+      recurse: true
 
   # Destination refers to the target Kubernetes cluster and namespace
   destination:
@@ -30,5 +32,3 @@ spec:
     syncOptions:
       # Ensure namespace 'minecore' is created if it does not already exist
       - CreateNamespace=true
-      # Apply resources recursively if subdirectories are present
-      - Recurse=true
