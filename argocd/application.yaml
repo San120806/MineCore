@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: minecore-app
+  namespace: argocd
+  labels:
+    app: minecore
+spec:
+  # The project within ArgoCD that this application belongs to
+  project: default
+
+  # Source refers to the Git repository containing Kubernetes manifests
+  source:
+    repoURL: 'https://github.com/San120806/MineCore.git'
+    targetRevision: main
+    path: k8s
+
+  # Destination refers to the target Kubernetes cluster and namespace
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: minecore
+
+  # Sync policy configuration for GitOps continuous reconciliation
+  syncPolicy:
+    automated:
+      # Automatically delete resources in the cluster that are deleted from Git
+      prune: true
+      # Automatically sync when cluster resources drift from the state in Git
+      selfHeal: true
+    syncOptions:
+      # Ensure namespace 'minecore' is created if it does not already exist
+      - CreateNamespace=true
+      # Apply resources recursively if subdirectories are present
+      - Recurse=true
