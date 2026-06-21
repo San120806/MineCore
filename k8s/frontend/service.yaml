@@ -1,12 +1,32 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# MineCore — Frontend Service
+# MineCore — Frontend ClusterIP Service
 # File: k8s/frontend/service.yaml
-# Purpose: Exposes frontend pod to the browser via NodePort
-#          NodePort 30000 → container port 3000
-#          Access in browser: http://localhost:30000
-#          Also routed by Ingress at path /
-# Apply Order: #11 — After frontend/deployment.yaml
-# Port: 3000 (container) → 30000 (node)
-# Type: NodePort
+# Phase: K8s-5 Frontend Deployment
+#
+# Service type: ClusterIP
+#   → reachable only from within the cluster. External requests route through Ingress.
+#   → Selects pods matching frontend component labels.
 # ─────────────────────────────────────────────────────────────────────────────
-# CONTENT: To be added in Objective 3.3
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: minecore-frontend-svc
+  namespace: minecore
+  labels:
+    app.kubernetes.io/name: frontend
+    app.kubernetes.io/instance: minecore
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/part-of: minecore
+    app.kubernetes.io/managed-by: kubectl
+    environment: development
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: frontend
+    app.kubernetes.io/part-of: minecore
+  ports:
+    - name: http
+      protocol: TCP
+      port: 3000          # Service port (cluster-internal)
+      targetPort: http    # Pod target port reference (http = 3000)

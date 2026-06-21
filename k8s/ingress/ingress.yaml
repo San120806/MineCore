@@ -1,13 +1,57 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # MineCore — Ingress
 # File: k8s/ingress/ingress.yaml
-# Purpose: Routes external HTTP traffic to the correct internal service
-#          Uses nginx IngressController (installed separately on kind)
-#          Rules:
-#            /api/*  → minecore-backend-svc:4000   (strips /api prefix)
-#            /*      → minecore-frontend-svc:3000
-#          Host: localhost (dev) or minecore.local
-# Apply Order: #12 — Last. Requires nginx IngressController to be installed first
-# Prerequisite: kubectl apply -f https://...ingress-nginx.../deploy.yaml
+# Phase: K8s-7 Ingress
+#
+# Key design decisions:
+#   Ingress Controller: nginx
+#     → Uses the ingress-nginx controller.
+#   Rules:
+#     - /api (Prefix) ➔ minecore-backend-svc:4000
+#       → Matches all API routes (e.g. /api/v1/auth). Note that we do NOT use
+#         rewrite-target annotations here because the Express backend app
+#         natively expects and handles the `/api` prefix.
+#     - / (Prefix) ➔ minecore-frontend-svc:3000
+#       → Catches all other traffic (home page, static assets, page bundles)
+#         and routes it to the Next.js frontend node.
+#   Host: omitted
+#     → Omitting the `host` parameter allows the Ingress to catch all traffic
+#       hitting `localhost` (port 80) directly, simplifying local development
+#       without requiring host file edits.
 # ─────────────────────────────────────────────────────────────────────────────
-# CONTENT: To be added in Objective 3.3
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minecore-ingress
+  namespace: minecore
+  annotations:
+    # Increase buffer limits and connection timeouts for WebSocket and dashboard polling
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "15"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    
+    # Adjust client body limits for potential image/log uploads
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          # Backend API Routing
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: minecore-backend-svc
+                port:
+                  number: 4000
+
+          # Frontend Next.js Application Routing
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: minecore-frontend-svc
+                port:
+                  number: 3000

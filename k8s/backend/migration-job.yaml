@@ -1,0 +1,82 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# MineCore — Database Migration Job
+# File: k8s/backend/migration-job.yaml
+# Objective 3.7: Database Migration Job
+#
+# Key design decisions:
+#   - Kind: Job (batch/v1)
+#     → Runs exactly once to completion (non-restarting on success).
+#   - Command: ["npx", "prisma", "migrate", "deploy"]
+#     → Executes Prisma migrations.
+#   - Image: minecore-backend:latest
+#     → Uses the backend image containing the schema.prisma and migrations folder.
+#   - Configuration:
+#     - envFrom ConfigMap: minecore-backend-config
+#     - envFrom Secret: minecore-app-secret
+#   - restartPolicy: OnFailure
+#     → If the migration fails (e.g. database not reachable yet), it will restart
+#       the pod up to backoffLimit times before marking the job as failed.
+#   - backoffLimit: 4 (limit retries to 4 times)
+#   - activeDeadlineSeconds: 300 (fail if it takes longer than 5 minutes)
+#
+# Depends on:
+#   - namespace:  minecore (namespace.yaml)
+#   - configmap:  minecore-backend-config (configmaps/app-config.yaml)
+#   - secret:     minecore-app-secret (secrets/app-secret.yaml)
+#   - service:    minecore-postgres-svc (postgres/service.yaml - database must be up)
+#
+# Apply Order: #7.5 — After postgres service is active, BEFORE deploying backend.
+# ─────────────────────────────────────────────────────────────────────────────
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minecore-migration-job
+  namespace: minecore
+  labels:
+    app.kubernetes.io/name: migration
+    app.kubernetes.io/instance: minecore
+    app.kubernetes.io/component: migration
+    app.kubernetes.io/part-of: minecore
+    app.kubernetes.io/managed-by: kubectl
+    environment: development
+spec:
+  backoffLimit: 4
+  activeDeadlineSeconds: 300
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: migration
+        app.kubernetes.io/instance: minecore
+        app.kubernetes.io/component: migration
+        app.kubernetes.io/part-of: minecore
+        environment: development
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: migration
+          image: minecore-backend:v1
+          # IfNotPresent: use the local image if it exists, otherwise fall back.
+          imagePullPolicy: IfNotPresent
+          
+          # Run database migrations
+          command:
+            - npx
+            - prisma
+            - migrate
+            - deploy
+          
+          # Injects configuration and secrets (including DATABASE_URL)
+          envFrom:
+            - configMapRef:
+                name: minecore-backend-config
+            - secretRef:
+                name: minecore-app-secret
+          
+          # Resource boundaries for running the migration
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"

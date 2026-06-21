@@ -1,13 +1,109 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # MineCore — Frontend Deployment
 # File: k8s/frontend/deployment.yaml
-# Purpose: Runs Next.js standalone server as a Deployment (1 replica)
-#          Injects config (NEXT_PUBLIC_API_URL, PORT, HOSTNAME) from app-config
-#          Resource limits: 100m–500m CPU, 256Mi–512Mi Memory
-#          Liveness probe:  GET / → 200
-#          Readiness probe: GET / → 200
-# Apply Order: #10 — After backend service is running and configmaps exist
-# Image: minecore-frontend:latest (loaded into kind via 'kind load docker-image')
-# Port: 3000
+# Phase: K8s-5 Frontend Deployment
+#
+# Key design decisions:
+#   Replicas: 2
+#     → Redundancy and basic high-availability for the Next.js frontend node.
+#   Strategy: RollingUpdate (maxSurge:1, maxUnavailable:0)
+#     → Ensures zero-downtime upgrades of the frontend layer.
+#   imagePullPolicy: IfNotPresent
+#     → Required for kind/Docker Desktop local registry caching.
+#   Image: minecore-frontend:v1
+#     → Uses the local frontend image built for the cluster container.
+#   Environment Injection:
+#     - envFrom ConfigMap (minecore-frontend-config):
+#         Loads PORT (3000), HOSTNAME (0.0.0.0), NODE_ENV (production), and
+#         NEXT_PUBLIC_API_URL pointing to the backend service.
+#   Probes:
+#     - readinessProbe: Checks GET / on port 3000. Confirms that the Next.js
+#       server has started and can render page templates.
+#     - livenessProbe: Re-checks GET / periodically. If the Next.js server hangs
+#       or crashes, Kubernetes restarts the container automatically.
 # ─────────────────────────────────────────────────────────────────────────────
-# CONTENT: To be added in Objective 3.3
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minecore-frontend
+  namespace: minecore
+  labels:
+    app.kubernetes.io/name: frontend
+    app.kubernetes.io/instance: minecore
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/part-of: minecore
+    app.kubernetes.io/managed-by: kubectl
+    environment: development
+spec:
+  replicas: 2
+
+  # Rolling update strategy to ensure at least 2 replicas are serving traffic during updates.
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: frontend
+      app.kubernetes.io/part-of: minecore
+
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: frontend
+        app.kubernetes.io/instance: minecore
+        app.kubernetes.io/component: frontend
+        app.kubernetes.io/part-of: minecore
+        environment: development
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: frontend
+          image: minecore-frontend:v1
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+
+          # Injects Next.js runtime environment variables
+          envFrom:
+            - configMapRef:
+                name: minecore-frontend-config
+
+          # CPU/Memory resource constraints appropriate for local development
+          resources:
+            requests:
+              cpu: "100m"      # 0.1 core allocation
+              memory: "256Mi"  # 256 MiB RAM guaranteed
+            limits:
+              cpu: "500m"      # Throttling limit
+              memory: "512Mi"  # Out Of Memory threshold
+
+          # Readiness Probe: controls traffic routing
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+              scheme: HTTP
+            initialDelaySeconds: 15  # Gives Next.js server time to compile/warm up
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+
+          # Liveness Probe: controls container restarts
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+              scheme: HTTP
+            initialDelaySeconds: 30  # Headroom for initial load
+            periodSeconds: 15
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 5

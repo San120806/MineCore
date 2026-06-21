@@ -1,35 +1,78 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # MineCore — Backend Deployment
 # File: k8s/backend/deployment.yaml
-# Objective 3.6: Backend Deployment
+# Phase: K8s-4 Backend Deployment
 #
 # Key design decisions:
-#   - Replicas: 2 (for high availability and load balancing)
-#   - Strategy: RollingUpdate (maxSurge: 1, maxUnavailable: 0)
-#     → Ensures zero-downtime deployments. New pods must pass readiness
-#       probes before old pods are terminated.
-#   - Command: ["sh", "-c", "npx prisma migrate deploy && node dist/server.js"]
-#     → Automatically runs Prisma migrations on pod startup.
-#     → Because Prisma migrations are idempotent, this is safe to run from
-#       multiple pods concurrently (Prisma uses a database lock table).
-#   - Configuration:
-#     - envFrom ConfigMap: minecore-backend-config
-#     - envFrom Secret: minecore-app-secret
-#   - Resource Limits:
-#     - Requests: 100m CPU, 256Mi Memory (guaranteed minimum)
-#     - Limits: 500m CPU, 512Mi Memory (throttling boundary)
-#   - Probes:
-#     - Liveness: GET /health (checks if app is running; restarts if failed)
-#     - Readiness: GET /health (checks if app is ready to serve traffic)
 #
-# Depends on:
-#   - namespace:  minecore (namespace.yaml)
-#   - configmap:  minecore-backend-config (configmaps/app-config.yaml)
-#   - secret:     minecore-app-secret (secrets/app-secret.yaml)
-#   - service:    minecore-postgres-svc (postgres/service.yaml - database must be up)
+#   Replicas: 2
+#     → Two replicas for basic high-availability. The backend is stateless
+#       (no session state stored in-process) so pods are interchangeable.
 #
-# Apply Order: #8 — After postgres service is active and healthy
+#   Strategy: RollingUpdate (maxSurge:1, maxUnavailable:0)
+#     → At any point during a rollout there are always ≥2 healthy pods serving
+#       traffic. A new pod must pass readinessProbe before any old pod is
+#       terminated (zero-downtime deploys).
+#
+#   imagePullPolicy: IfNotPresent
+#     → Required for Docker Desktop local clusters. The image is built locally
+#       with `docker build -t minecore-backend:latest ./backend` and is already
+#       present in the local Docker daemon (which Docker Desktop exposes to the
+#       K8s node). Never change this to Always for local dev — it would try to
+#       pull from a registry that doesn't have the image.
+#
+#   Command: ["node", "dist/server.js"]
+#     → Does NOT run migrations. Migrations are intentionally handled by the
+#       separate minecore-migration-job (migration-job.yaml) before this
+#       Deployment is applied. Embedding migrate-deploy inside a multi-replica
+#       Deployment introduces a race condition: two pods racing to acquire the
+#       Prisma migration lock on startup causes one pod to fail and restart.
+#
+#   Environment injection strategy (mixed approach):
+#     - envFrom ConfigMap (minecore-backend-config):
+#         NODE_ENV, PORT, API_VERSION, CORS_ORIGIN,
+#         RATE_LIMIT_WINDOW_MS, RATE_LIMIT_MAX,
+#         JWT_ACCESS_EXPIRES_IN, JWT_REFRESH_EXPIRES_IN
+#     - env[].valueFrom.secretKeyRef (minecore-app-secret):
+#         DATABASE_URL, JWT_ACCESS_SECRET, JWT_REFRESH_SECRET
+#       → Only the three secrets the backend needs are explicitly injected.
+#         This follows the principle of least privilege; the pod does NOT
+#         receive the Postgres-only keys (POSTGRES_USER, POSTGRES_PASSWORD,
+#         POSTGRES_DB) that it has no business reading.
+#
+#   Probes:
+#     Readiness: GET /health → port 4000
+#       initialDelay=15s: Express starts in ~3s but wait for the event loop
+#         to fully warm up after starting.
+#       period=10s, timeout=5s, failureThreshold=3
+#       → Pod removed from service endpoints (stops receiving traffic) after
+#         3 consecutive failures (~30s). Frontend won't see 503s during restarts.
+#
+#     Liveness: GET /health → port 4000
+#       initialDelay=30s: Give extra headroom at first boot.
+#       period=15s, timeout=5s, failureThreshold=5
+#       → Pod is restarted only after 5 consecutive failures (~75s after the
+#         last passing probe). This prevents premature restarts during
+#         momentary DB connection hiccups.
+#
+#   Resources:
+#     Requests (guaranteed allocation):  100m CPU, 256Mi memory
+#     Limits   (hard throttling cap):    500m CPU, 512Mi memory
+#     → Conservative for a local Docker Desktop cluster (typically 2 CPUs / 4GB
+#       RAM total). Two backend replicas will consume at most 1 CPU core and
+#       1GiB RAM combined at peak, leaving headroom for postgres + frontend.
+#
+# Depends on (apply these first):
+#   1. namespace.yaml              → namespace: minecore
+#   2. configmaps/app-config.yaml  → minecore-backend-config
+#   3. secrets/app-secret.yaml     → minecore-app-secret
+#   4. postgres/deployment.yaml    → minecore-postgres StatefulSet
+#   5. postgres/service.yaml       → minecore-postgres-svc (DNS for DATABASE_URL)
+#   6. backend/migration-job.yaml  → schema must be applied before app starts
+#
+# Apply Order: #8 — After migration Job reaches Completed status
 # ─────────────────────────────────────────────────────────────────────────────
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -45,15 +88,24 @@ metadata:
     environment: development
 spec:
   replicas: 2
+
+  # ── Rolling Update Strategy ───────────────────────────────────────────────
+  # maxUnavailable: 0  → never take a pod down before a new one is Ready
+  # maxSurge: 1        → spin up one extra pod during the rollout window
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 0
+
+  # ── Pod Selector ──────────────────────────────────────────────────────────
+  # MUST match .spec.template.metadata.labels (immutable after creation)
   selector:
     matchLabels:
       app.kubernetes.io/name: backend
       app.kubernetes.io/part-of: minecore
+
+  # ── Pod Template ──────────────────────────────────────────────────────────
   template:
     metadata:
       labels:
@@ -62,54 +114,104 @@ spec:
         app.kubernetes.io/component: backend
         app.kubernetes.io/part-of: minecore
         environment: development
+
     spec:
+      # ── Graceful Shutdown ────────────────────────────────────────────────
+      # Give Express 30s to drain in-flight HTTP requests before SIGKILL.
+      terminationGracePeriodSeconds: 30
+
       containers:
         - name: backend
-          image: minecore-backend:latest
+          # Built locally: docker build -t minecore-backend:v1 ./backend
+          image: minecore-backend:v1
+
+          # IfNotPresent: use the local image if it exists, otherwise fall back.
           imagePullPolicy: IfNotPresent
+
           ports:
             - name: http
               containerPort: 4000
               protocol: TCP
-          
-          # Command override to run migrations first
-          command:
-            - sh
-            - -c
-            - "npx prisma migrate deploy && node dist/server.js"
-          
-          # Injects configuration and secrets
+
+          # ── Command ──────────────────────────────────────────────────────
+          # Start the compiled Express server directly.
+          # Migrations are NOT run here — they are handled by the
+          # minecore-migration-job (batch/v1 Job) which must complete
+          # successfully before this Deployment is applied.
+          command: ["node", "dist/server.js"]
+
+          # ── Environment — Non-Sensitive (from ConfigMap) ─────────────────
+          # Injects: NODE_ENV, PORT, API_VERSION, CORS_ORIGIN,
+          #          RATE_LIMIT_WINDOW_MS, RATE_LIMIT_MAX,
+          #          JWT_ACCESS_EXPIRES_IN, JWT_REFRESH_EXPIRES_IN
           envFrom:
             - configMapRef:
                 name: minecore-backend-config
-            - secretRef:
-                name: minecore-app-secret
-          
-          # Resource constraints
+
+          # ── Environment — Sensitive (individual secretKeyRef) ─────────────
+          # Only the three keys the backend needs are injected.
+          # POSTGRES_USER / POSTGRES_PASSWORD / POSTGRES_DB are intentionally
+          # excluded — the backend connects via DATABASE_URL only.
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: minecore-app-secret
+                  key: DATABASE_URL
+
+            - name: JWT_ACCESS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: minecore-app-secret
+                  key: JWT_ACCESS_SECRET
+
+            - name: JWT_REFRESH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: minecore-app-secret
+                  key: JWT_REFRESH_SECRET
+
+          # ── Resource Requests and Limits ─────────────────────────────────
           resources:
             requests:
-              cpu: "100m"
-              memory: "256Mi"
+              cpu: "100m"      # 0.1 CPU core guaranteed
+              memory: "256Mi"  # 256 MiB RAM guaranteed
             limits:
-              cpu: "500m"
-              memory: "512Mi"
-          
-          # Liveness Probe (Restarts container if app freezes)
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 4000
-            initialDelaySeconds: 30  # Give Prisma migrations time to run
-            periodSeconds: 15
-            timeoutSeconds: 5
-            failureThreshold: 5
-          
-          # Readiness Probe (Adds container to service pool when ready)
+              cpu: "500m"      # Hard cap at 0.5 CPU core (throttled, not killed)
+              memory: "512Mi"  # Hard cap at 512 MiB (OOMKilled if exceeded)
+
+          # ── Readiness Probe ──────────────────────────────────────────────
+          # Controls whether this pod receives traffic from the Service.
+          # The /health endpoint responds 200 immediately after Express binds
+          # and Prisma has established its connection pool.
+          #
+          # Traffic flow:
+          #   PASS → pod added to Service endpoint slice → receives requests
+          #   FAIL → pod removed from endpoint slice → no traffic, no 503s
           readinessProbe:
             httpGet:
               path: /health
               port: 4000
-            initialDelaySeconds: 15  # Start checking early
-            periodSeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 3
+              scheme: HTTP
+            initialDelaySeconds: 15  # Express + Prisma pool init (~3-8s, extra buffer)
+            periodSeconds: 10         # Re-check every 10 seconds
+            timeoutSeconds: 5         # Fail if /health doesn't respond in 5s
+            successThreshold: 1       # One passing check is enough to mark Ready
+            failureThreshold: 3       # 3 consecutive failures → remove from endpoints
+
+          # ── Liveness Probe ───────────────────────────────────────────────
+          # Controls whether Kubernetes restarts this container.
+          # Uses a higher initialDelay and failureThreshold than readiness
+          # to avoid premature restarts on first boot or during DB hiccups.
+          #
+          # Restart trigger: 5 failures × 15s period = ~75s after last pass
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 4000
+              scheme: HTTP
+            initialDelaySeconds: 30  # Wait 30s before first check (first-boot headroom)
+            periodSeconds: 15         # Check every 15 seconds
+            timeoutSeconds: 5         # Fail if /health doesn't respond in 5s
+            successThreshold: 1       # One passing check resets the failure counter
+            failureThreshold: 5       # 5 consecutive failures → container restarted

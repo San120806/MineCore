@@ -1,20 +1,43 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # MineCore — Backend ClusterIP Service
 # File: k8s/backend/service.yaml
-# Objective 3.6: Backend Deployment
+# Phase: K8s-4 Backend Deployment
 #
 # Service type: ClusterIP
-#   → Internal-only. The backend service is not exposed directly outside the
-#     cluster; ingress routing (or local port forwarding) will access it.
-#   → DNS: minecore-backend-svc.minecore.svc.cluster.local
-#   → Frontend pods reach backend at: http://minecore-backend-svc:4000
+#   → Internal-only. The backend is never exposed directly to the outside world.
+#     All external traffic enters through the Ingress controller
+#     (k8s/ingress/ingress.yaml) which routes to this service.
 #
-# CRITICAL: The service name 'minecore-backend-svc' must match the hostname
-# used in the frontend NEXT_PUBLIC_API_URL ConfigMap:
-#   NEXT_PUBLIC_API_URL: "http://minecore-backend-svc:4000"
+#   → Frontend pods resolve the backend via this in-cluster DNS name:
+#       http://minecore-backend-svc:4000
+#     Full qualified form (also works):
+#       http://minecore-backend-svc.minecore.svc.cluster.local:4000
+#
+#   → Local developer port-forward for direct API testing:
+#       kubectl port-forward svc/minecore-backend-svc 4000:4000 -n minecore
+#
+# CRITICAL name dependency:
+#   The service name "minecore-backend-svc" is referenced in two places
+#   that must stay in sync:
+#     1. configmaps/app-config.yaml → NEXT_PUBLIC_API_URL (frontend reads this)
+#     2. secrets/app-secret.yaml   → DATABASE_URL hostname (already minecore-postgres-svc)
+#
+# Selector:
+#   Matches pods with BOTH labels:
+#     app.kubernetes.io/name: backend
+#     app.kubernetes.io/part-of: minecore
+#   This is the same two-label selector used in the Deployment's matchLabels,
+#   ensuring only minecore-backend pods (not postgres or frontend) receive traffic.
+#
+# Port mapping:
+#   port 4000       → the port the Service listens on inside the cluster
+#   targetPort: http → resolves to containerPort named "http" (4000) in the pod spec
+#                      (using the named port reference instead of a raw number
+#                       makes it resilient to port renumbering)
 #
 # Apply Order: #9 — After backend/deployment.yaml
 # ─────────────────────────────────────────────────────────────────────────────
+
 apiVersion: v1
 kind: Service
 metadata:
@@ -28,13 +51,18 @@ metadata:
     app.kubernetes.io/managed-by: kubectl
     environment: development
 spec:
+  # ClusterIP: reachable only from inside the cluster.
+  # The Ingress controller is the single external entry point for the backend.
   type: ClusterIP
+
+  # Routes traffic to pods that have ALL of these labels.
+  # Must match .spec.selector.matchLabels in backend/deployment.yaml.
   selector:
-    # Routes traffic to pods with these labels (set in backend Deployment)
     app.kubernetes.io/name: backend
     app.kubernetes.io/part-of: minecore
+
   ports:
     - name: http
       protocol: TCP
-      port: 4000         # Port the service listens on inside the cluster
-      targetPort: 4000   # Port the backend container runs on
+      port: 4000          # Port the Service listens on (cluster-internal)
+      targetPort: http    # Named port reference → containerPort "http" = 4000
