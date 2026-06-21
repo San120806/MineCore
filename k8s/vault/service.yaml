@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: vault-svc
+  namespace: minecore
+  labels:
+    app: minecore-vault
+spec:
+  selector:
+    app: minecore-vault
+  ports:
+  - port: 8200
+    targetPort: 8200
+    name: vault
+  type: ClusterIP

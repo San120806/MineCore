@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minecore-vault
+  namespace: minecore
+  labels:
+    app: minecore-vault
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minecore-vault
+  template:
+    metadata:
+      labels:
+        app: minecore-vault
+    spec:
+      containers:
+      - name: vault
+        image: hashicorp/vault:1.15
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8200
+          name: vaultport
+        env:
+        # Dev mode enables quick cluster access without manual unsealing
+        - name: VAULT_DEV_ROOT_TOKEN_ID
+          value: "minecore-vault-token"
+        - name: VAULT_DEV_LISTEN_ADDRESS
+          value: "0.0.0.0:8200"
+        - name: VAULT_ADDR
+          value: "http://0.0.0.0:8200"
+        securityContext:
+          capabilities:
+            add: ["IPC_LOCK"]
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "200m"
+            memory: "256Mi"

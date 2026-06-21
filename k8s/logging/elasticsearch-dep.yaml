@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minecore-elasticsearch
+  namespace: minecore
+  labels:
+    app: elasticsearch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      containers:
+      - name: elasticsearch
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.17.10
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9200
+          name: dbport
+        - containerPort: 9300
+          name: nodeport
+        env:
+        # Dev mode single node discovery
+        - name: discovery.type
+          value: "single-node"
+        # Bound Java heap memory limit for local resource limits
+        - name: ES_JAVA_OPTS
+          value: "-Xms256m -Xmx256m"
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "384Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
