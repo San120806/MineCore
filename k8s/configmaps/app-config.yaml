@@ -29,7 +29,7 @@ data:
 
   # CORS — allow frontend NodePort (30000) and Ingress port 80
   # Update CORS_ORIGIN when switching to a real domain or Ingress
-  CORS_ORIGIN: "http://localhost:30000"
+  CORS_ORIGIN: "http://localhost"
 
   # Rate Limiting
   RATE_LIMIT_WINDOW_MS: "900000"   # 15 minutes in milliseconds
